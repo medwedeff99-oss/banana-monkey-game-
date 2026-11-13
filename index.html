@@ -12,7 +12,7 @@
       content="A twelve-page illustrated jungle rom-com. One awkward monkey, one terrible pickup line, and a very unexpected happily ever after."
     />
     <title>Banana Monkey Love Quest — A Love Story, With Issues</title>
-    <link rel="stylesheet" href="./style.css?v=kindness" />
+    <link rel="stylesheet" href="./style.css?v=audio-story" />
     <link rel="icon" href="./assets/banana.svg" type="image/svg+xml" />
   </head>
   <body>
@@ -41,9 +41,17 @@
       <div class="top-actions">
         <span class="edition">THE PICTURE BOOK EDITION</span
         ><button
+          id="narrator"
+          class="narrator-toggle"
+          aria-pressed="false"
+          title="Read the visible pages aloud"
+        >
+          Read aloud</button
+        ><button
           id="sound"
           class="icon-btn"
-          aria-label="Turn sound on"
+          aria-label="Turn sound effects on"
+          title="Scene sound effects"
           aria-pressed="false"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -121,6 +129,6 @@
         CSS, and JavaScript.</small
       >
     </dialog>
-    <script src="./game.js?v=kindness" defer></script>
+    <script src="./game.js?v=audio-story" defer></script>
   </body>
 </html>

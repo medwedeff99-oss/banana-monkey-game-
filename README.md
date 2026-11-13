@@ -12,7 +12,9 @@ A twelve-page illustrated romantic comedy about Milo, Luna, an extremely confide
 - Short narration and sarcastic dialogue; no mini-games or choices interrupting the story.
 - A fake ending with credits and a delayed cry. An explicit inside-book page-turn button leads to the concealed final reveal, even when the navigation is below the screen.
 - A twins reveal and a banana that arcs from the baby’s hand up over the book.
-- Optional generated page-turn and comic sound effects. Sound starts off.
+- Separate optional **Read aloud** and **sound effects** controls; both start off.
+- Read aloud uses the browser’s available English speech voice, reads only visible pages, and cancels on page turns. Voice quality and availability depend on the browser/device.
+- Twelve short synthesized cartoon scene cues (monkey-like hoots, comic gasp/laugh tones, rain, romantic chimes, dramatic drums, and wedding applause), plus animated reaction captions for silent reading. These are stylized effects, not recordings of actors or a real audience.
 - Device-local reading progress, resilient to blocked storage; reduced-motion support and accessible illustration descriptions.
 
 ## Review without enabling GitHub Pages

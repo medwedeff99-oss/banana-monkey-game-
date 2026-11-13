@@ -12,6 +12,8 @@ function reader({
   reduced = false,
   saved = null,
   blockedStorage = false,
+  speech = false,
+  audio = false,
 } = {}) {
   const dom = new JSDOM(html, {
       url: "https://example.test/banana-monkey-game-/",
@@ -47,6 +49,68 @@ function reader({
     };
     w.Storage.prototype.getItem = () => {
       throw Error("storage disabled");
+    };
+  }
+  if (speech) {
+    w.SpeechSynthesisUtterance = class {
+      constructor(text) {
+        this.text = text;
+      }
+    };
+    w.speechSynthesis = {
+      spoken: [],
+      cancels: 0,
+      cancel() {
+        this.cancels++;
+      },
+      getVoices() {
+        return [{ name: "English Natural", lang: "en-US" }];
+      },
+      speak(u) {
+        this.spoken.push(u);
+      },
+    };
+  }
+  if (audio) {
+    w.audioStarts = 0;
+    const param = () => ({
+      setValueAtTime() {},
+      exponentialRampToValueAtTime() {},
+      linearRampToValueAtTime() {},
+      value: 0,
+    });
+    const node = () => ({
+      connect() {},
+      start() {
+        w.audioStarts++;
+      },
+      stop() {},
+      frequency: param(),
+      gain: param(),
+    });
+    w.AudioContext = class {
+      constructor() {
+        this.currentTime = 0;
+        this.sampleRate = 1000;
+        this.destination = {};
+      }
+      resume() {}
+      suspend() {}
+      createOscillator() {
+        return node();
+      }
+      createGain() {
+        return node();
+      }
+      createBiquadFilter() {
+        return node();
+      }
+      createBufferSource() {
+        return node();
+      }
+      createBuffer(c, n) {
+        return { getChannelData: () => new Float32Array(n) };
+      }
     };
   }
   w.eval(script);
@@ -370,5 +434,65 @@ test("final banana grows to fill most of the viewport", () => {
     Number(banana.style.getPropertyValue("--end-scale")) >
       Number(banana.style.getPropertyValue("--big-scale")),
   );
+  r.close();
+});
+
+test("optional narrator reads only visible pages and cancels when pages turn", () => {
+  const r = reader({ speech: true, mobile: true });
+  assert.equal(r.$("narrator").disabled, false);
+  r.next();
+  r.$("narrator").click();
+  let speech = r.w.speechSynthesis;
+  assert(speech.spoken.at(-1).text.includes("premium bananas"));
+  const old = speech.spoken.at(-1),
+    cancels = speech.cancels;
+  r.next();
+  assert(speech.cancels > cancels);
+  assert(speech.spoken.at(-1).text.includes("eighteen banana splits"));
+  const total = speech.spoken.length;
+  old.onend();
+  r.tick(1000);
+  assert.equal(speech.spoken.length, total);
+  r.$("narrator").click();
+  assert.equal(r.$("narrator").getAttribute("aria-pressed"), "false");
+  r.close();
+});
+test("narrator does not spoil concealed twins, and disabled browser speech is handled", () => {
+  const r = reader({
+    speech: true,
+    saved: JSON.stringify({ cursor: 10, revealed: false }),
+  });
+  r.$("narrator").click();
+  assert(!r.w.speechSynthesis.spoken.at(-1).text.includes("Peel Jr."));
+  r.$("book").querySelector("[data-reveal]").click();
+  r.tick();
+  assert(r.w.speechSynthesis.spoken.at(-1).text.includes("Happily"));
+  r.w.speechSynthesis.spoken.at(-1).onend();
+  r.tick(1000);
+  assert(r.w.speechSynthesis.spoken.at(-1).text.includes("Peel Jr."));
+  r.close();
+  const q = reader();
+  assert(q.$("narrator").disabled);
+  q.close();
+});
+test("every page has a short scene cue; sound effects can be muted independently of narration", () => {
+  const r = reader({ audio: true, speech: true, mobile: true });
+  r.$("sound").click();
+  for (let i = 0; i < 12; i++) {
+    const before = r.w.audioStarts;
+    r.next();
+    r.tick(1000);
+    assert(r.w.audioStarts > before);
+    assert(r.$("book").querySelector(".scene-reaction").textContent.length > 0);
+  }
+  r.$("narrator").click();
+  const spoken = r.w.speechSynthesis.spoken.length;
+  r.$("sound").click();
+  assert.equal(r.$("sound").getAttribute("aria-pressed"), "false");
+  assert.equal(r.$("narrator").getAttribute("aria-pressed"), "true");
+  assert.equal(r.w.speechSynthesis.spoken.length, spoken);
+  r.$("sound").click();
+  r.tick(1000);
+  assert.equal(r.w.speechSynthesis.spoken.length, spoken);
   r.close();
 });

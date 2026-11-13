@@ -148,6 +148,9 @@ let cursor = -1,
   busy = false,
   audioOn = false,
   audioContext,
+  narratorOn = false,
+  audioGeneration = 0,
+  sceneTimers = [],
   cryTimer,
   flipTimer,
   actionTimer,
@@ -185,7 +188,7 @@ function artMarkup(i) {
     : revised
       ? "story-revisions.png"
       : `chapters-${sheet === 1 ? "01-04" : sheet === 2 ? "05-08" : "09-12"}.png`;
-  return `<div class="illustration" style="--x:${x};--y:${y}"><span class="loading-art" aria-hidden="true">A little jungle magic…</span><img src="./assets/${asset}" alt="${STORY[i].alt}" draggable="false" decoding="async"><div class="ill-overlay" aria-hidden="true">${i === 3 ? '<span class="sfx sfx-slip">whoooops.</span>' : i === 6 ? '<span class="sfx sfx-chaos">WHOOSH!</span>' : i === 11 ? '<span class="sfx sfx-burst">SURPRISE.</span>' : i === 4 || i === 9 ? '<span class="heart-spark" style="left:17%;top:26%">✧</span><span class="heart-spark" style="left:79%;top:16%;animation-delay:1s">✦</span>' : ""}</div></div>`;
+  return `<div class="illustration" style="--x:${x};--y:${y}"><span class="loading-art" aria-hidden="true">A little jungle magic…</span><img src="./assets/${asset}" alt="${STORY[i].alt}" draggable="false" decoding="async"><div class="ill-overlay" aria-hidden="true"><span class="scene-reaction">${SCENE_AUDIO[i].label}</span>${i === 3 ? '<span class="sfx sfx-slip">whoooops.</span>' : i === 6 ? '<span class="sfx sfx-chaos">WHOOSH!</span>' : i === 11 ? '<span class="sfx sfx-burst">SURPRISE.</span>' : i === 4 || i === 9 ? '<span class="heart-spark" style="left:17%;top:26%">✧</span><span class="heart-spark" style="left:79%;top:16%;animation-delay:1s">✦</span>' : ""}</div></div>`;
 }
 function pageMarkup(i, side = "left", animate = true) {
   const s = STORY[i];
@@ -216,6 +219,7 @@ function isFakeEnding() {
   return cursor === 10 && !isFinal();
 }
 function render(animate = true) {
+  stopStoryAudio();
   clearTimeout(cryTimer);
   clearTimeout(actionTimer);
   alignCursor();
@@ -240,6 +244,7 @@ function render(animate = true) {
   }
   if (isFinal() && animate) actionTimer = setTimeout(throwBanana, 1700);
   save();
+  if (animate) queueStoryAudio();
 }
 function updateNavigation() {
   $("prev").disabled = cursor < 0;
@@ -466,10 +471,201 @@ function playSound(kind) {
 function updateSoundButton() {
   const b = $("sound");
   b.setAttribute("aria-pressed", String(audioOn));
-  b.setAttribute("aria-label", audioOn ? "Turn sound off" : "Turn sound on");
+  b.setAttribute(
+    "aria-label",
+    audioOn ? "Turn sound effects off" : "Turn sound effects on",
+  );
+  b.title = audioOn ? "Sound effects on" : "Sound effects off";
   b.innerHTML = audioOn
     ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm5 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>'
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6"/></svg>';
+}
+const SCENE_AUDIO = [
+  { kind: "monkey", label: "ooh… awkward." },
+  { kind: "laugh", label: "…separate checks?" },
+  { kind: "chime", label: "a tiny spark ✧" },
+  { kind: "gasp", label: "audience: GASP!" },
+  { kind: "romance", label: "audience: awww…" },
+  { kind: "entrance", label: "cue the dramatic drums" },
+  { kind: "rain", label: "pitter-patter… WHOOSH!" },
+  { kind: "romance", label: "audience: awww!" },
+  { kind: "gasp", label: "a very tiny gasp" },
+  { kind: "cheer", label: "cheers from the jungle!" },
+  { kind: "night", label: "quiet… too quiet." },
+  { kind: "monkey", label: "audience: DOUBLE GASP!" },
+];
+function stopStoryAudio() {
+  audioGeneration++;
+  sceneTimers.forEach(clearTimeout);
+  sceneTimers = [];
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  document
+    .querySelectorAll(".is-speaking")
+    .forEach((p) => p.classList.remove("is-speaking"));
+}
+function queueStoryAudio() {
+  sceneTimers.forEach(clearTimeout);
+  sceneTimers = [];
+  if (narratorOn) {
+    sceneTimers.push(setTimeout(narrateVisiblePages, 750));
+    return;
+  }
+  if (audioOn)
+    visiblePages().forEach((page, i) =>
+      sceneTimers.push(setTimeout(() => playSceneAudio(page), 800 + i * 2100)),
+    );
+}
+function narrateVisiblePages() {
+  if (!narratorOn || !window.speechSynthesis) return;
+  const generation = audioGeneration;
+  const pages = visiblePages();
+  const narrate = (n) => {
+    if (!narratorOn || generation !== audioGeneration) return;
+    if (n >= pages.length) return;
+    const i = pages[n],
+      s = STORY[i];
+    const text =
+      s.title.replace(/<[^>]*>/g, "") +
+      ". " +
+      s.narration +
+      " " +
+      s.lines
+        .map(
+          ([speaker, line]) =>
+            (speaker === "Narrator" ? "" : speaker + " says: ") + line,
+        )
+        .join(" ");
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const voice =
+      voices.find(
+        (v) =>
+          v.lang.startsWith("en") &&
+          /natural|premium|samantha|daniel/i.test(v.name),
+      ) || voices.find((v) => v.lang.startsWith("en"));
+    if (voice) utterance.voice = voice;
+    const page = $("book").querySelector(`.spread > [data-page="${i}"]`);
+    if (page) page.classList.add("is-speaking");
+    utterance.onend = () => {
+      if (generation !== audioGeneration) return;
+      if (page) page.classList.remove("is-speaking");
+      playSceneAudio(i);
+      sceneTimers.push(setTimeout(() => narrate(n + 1), 900));
+    };
+    utterance.onerror = () => {
+      if (generation === audioGeneration && page)
+        page.classList.remove("is-speaking");
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+  if (!pages.length) {
+    const intro = new SpeechSynthesisUtterance(
+      "Banana Monkey Love Quest. A love story, with issues. Open the book to begin.",
+    );
+    intro.rate = 0.95;
+    window.speechSynthesis.speak(intro);
+  } else narrate(0);
+}
+function playSceneAudio(page) {
+  if (!audioOn) return;
+  try {
+    audioContext =
+      audioContext || new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume();
+    const now = audioContext.currentTime,
+      kind = SCENE_AUDIO[page].kind;
+    const tone = (
+      offset,
+      freq,
+      end,
+      duration = 0.16,
+      type = "sine",
+      volume = 0.045,
+    ) => {
+      const o = audioContext.createOscillator(),
+        g = audioContext.createGain(),
+        t = now + offset;
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t);
+      o.frequency.exponentialRampToValueAtTime(Math.max(30, end), t + duration);
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.exponentialRampToValueAtTime(volume, t + 0.025);
+      g.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      o.connect(g);
+      g.connect(audioContext.destination);
+      o.start(t);
+      o.stop(t + duration + 0.02);
+    };
+    const noise = (offset, duration, volume, cutoff) => {
+      const buffer = audioContext.createBuffer(
+          1,
+          Math.ceil(audioContext.sampleRate * duration),
+          audioContext.sampleRate,
+        ),
+        d = buffer.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const src = audioContext.createBufferSource(),
+        f = audioContext.createBiquadFilter(),
+        g = audioContext.createGain(),
+        t = now + offset;
+      src.buffer = buffer;
+      f.type = "lowpass";
+      f.frequency.value = cutoff;
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(volume, t + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      src.connect(f);
+      f.connect(g);
+      g.connect(audioContext.destination);
+      src.start(t);
+      src.stop(t + duration);
+    };
+    if (kind === "monkey") {
+      [0, 0.2, 0.46, 0.73].forEach((t, i) =>
+        tone(t, 420 + (i % 2) * 150, 820 - i * 80, 0.2, "triangle", 0.035),
+      );
+    }
+    if (kind === "laugh") {
+      [0, 0.13, 0.28, 0.48, 0.62].forEach((t, i) =>
+        tone(t, 320 + (i % 2) * 100, 210, 0.09, "triangle", 0.035),
+      );
+    }
+    if (kind === "gasp") {
+      noise(0, 0.45, 0.08, 2100);
+      tone(0.05, 290, 650, 0.35, "sine", 0.035);
+    }
+    if (kind === "chime" || kind === "romance") {
+      [523, 659, 784, 1046].forEach((f, i) =>
+        tone(i * 0.12, f, f, 0.4, "sine", 0.035),
+      );
+    }
+    if (kind === "entrance") {
+      [0, 0.24, 0.48].forEach((t) => tone(t, 140, 45, 0.23, "triangle", 0.07));
+      tone(0.72, 196, 196, 0.6, "triangle", 0.045);
+    }
+    if (kind === "rain") {
+      noise(0, 1.2, 0.065, 3500);
+      noise(0.4, 0.7, 0.05, 1800);
+      tone(0.7, 320, 900, 0.3, "sine", 0.025);
+    }
+    if (kind === "cheer") {
+      [0, 0.12, 0.27, 0.42, 0.6, 0.78].forEach((t) =>
+        noise(t, 0.16, 0.09, 4000),
+      );
+      [523, 659, 784].forEach((f, i) =>
+        tone(0.1 + i * 0.18, f, f, 0.4, "triangle", 0.025),
+      );
+    }
+    if (kind === "night") {
+      [0, 0.35, 0.75].forEach((t) => tone(t, 2400, 2200, 0.06, "sine", 0.015));
+    }
+  } catch {
+    audioOn = false;
+    updateSoundButton();
+  }
 }
 function init() {
   $("book").addEventListener("click", (event) => {
@@ -479,6 +675,23 @@ function init() {
       const i = Number(secret.dataset.secret);
       flyFromPage(i === 3 ? "smoothie" : i === 6 ? "leaf" : "banana", i);
     }
+  });
+  const supportsSpeech =
+    "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  $("narrator").disabled = !supportsSpeech;
+  if (!supportsSpeech)
+    $("narrator").title =
+      "Read aloud is unavailable in this browser; scene sounds are still available.";
+  $("narrator").addEventListener("click", () => {
+    narratorOn = !narratorOn;
+    $("narrator").setAttribute("aria-pressed", String(narratorOn));
+    $("narrator").textContent = narratorOn ? "Stop reading" : "Read aloud";
+    stopStoryAudio();
+    if (narratorOn) narrateVisiblePages();
+    else queueStoryAudio();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopStoryAudio();
   });
   readSaved();
   alignCursor();
@@ -493,7 +706,16 @@ function init() {
   $("sound").addEventListener("click", () => {
     audioOn = !audioOn;
     updateSoundButton();
-    playSound("page");
+    if (audioOn) {
+      playSound("page");
+      if (!narratorOn) queueStoryAudio();
+    } else {
+      if (!narratorOn) {
+        sceneTimers.forEach(clearTimeout);
+        sceneTimers = [];
+      }
+      if (audioContext) audioContext.suspend();
+    }
   });
   $("credits-button").addEventListener("click", () => $("about").showModal());
   $("about")
