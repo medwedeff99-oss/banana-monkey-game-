@@ -1,51 +1,49 @@
-# 🍌 Banana Monkey Love Quest
+# Banana Monkey Love Quest
 
-**A ridiculously cute interactive jungle rom-com.**
+A twelve-page illustrated romantic comedy about Milo, Luna, an extremely confident gorilla, and one unexpected small monkey.
 
-Milo is a lonely monkey looking for love on BANANAR, the worst dating app in the jungle. He meets Luna, survives ridiculous banana-themed dates, faces an enormous rival gorilla named Bruno, and might actually find true love. Stay for the credits. Seriously.
+## The book
 
-## 🎮 Play
+- A textured, forest-green hardcover and warm, illustrated interior pages.
+- Twelve distinct gouache-style scenes, with consistent characters and specific physical comedy.
+- Two facing pages on desktop; one page at a time on phones (700px breakpoint).
+- Animated page turns, horizontal swipe gestures, keyboard arrows, and a cover/restart control.
+- Short narration and sarcastic dialogue; no mini-games or choices interrupting the story.
+- A fake ending with credits and a delayed cry. Page twelve stays concealed until the reader turns again, even on desktop.
+- A baby reveal and a banana thrown toward the reader.
+- Optional generated page-turn and comic sound effects. Sound starts off.
+- Device-local reading progress, resilient to blocked storage; reduced-motion support and accessible illustration descriptions.
 
-**GitHub Pages (when enabled):**
-https://medwedeff99-oss.github.io/banana-monkey-game-/
+## Review without enabling GitHub Pages
 
-**Instant HTML preview (external CDN):**
-https://raw.githack.com/medwedeff99-oss/banana-monkey-game-/main/index.html
+Use the **commit-pinned preview URL supplied with the review handoff**. It serves these static files through raw.githack.com; it does not enable GitHub Pages or change repository settings. CDN availability and caching are outside this repository's control.
 
-## 🐒 What's inside
+You can also download this repository and open `index.html` directly in a modern browser. There is no build step or runtime dependency. All illustrations are local; the optional Google Fonts stylesheet falls back to Georgia and Arial without network access.
 
-- Original SVG art for Milo, Luna, Bruno, and surprise baby Peel Jr. No uploads or external image assets needed.
-- 12 story scenes from dating app to wedding and the twist ending
-- Swipe-able dating profiles
-- Choose-your-own pickup line
-- Physical comedy and date mishaps
-- Three absurd gorilla-rivalry mini-challenges
-- Romance, proposal, wedding, fake ending, and surprise baby
-- Playful sound toggle and restart controls
-- Mobile-responsive, iPhone-friendly design
-- Progress automatically saved in browser local storage
-- Self-contained static site: no build, package manager, API keys, or server required
+**Publishing is intentionally not configured.** No GitHub Pages workflow, deployment action, or Sites publication is included. The owner must approve publication separately.
 
-## 🚀 Enable GitHub Pages — one time
+## Compatibility
 
-1. Open [this repo's Pages settings](https://github.com/medwedeff99-oss/banana-monkey-game-/settings/pages).
-2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
-3. Choose **main** and **/(root)**, then press **Save**.
-4. The game should publish at:
-   https://medwedeff99-oss.github.io/banana-monkey-game-/
+`index.html`, `style.css`, `game.js`, and every asset use relative paths. They work from a repository subdirectory such as `/banana-monkey-game-/`, so the book remains compatible with GitHub Pages when the owner decides to enable it. `.nojekyll` is included. Node is only used for development tests.
 
-Once enabled, GitHub Pages automatically publishes updates pushed to the main branch. GitHub Pages can take a few minutes to deploy.
+## Tests
 
-## 🧪 Test locally
+```sh
+npm ci
+npm test
+```
 
-Open index.html in a browser, or use a local static file server. The project consists of:
+The tests exercise the rendered DOM with jsdom and controlled timers: all twelve pages, desktop/mobile navigation, the concealed reveal, swipe thresholds, keyboard controls, rapid-click guards, saved progress, resizing, replay, cancelled timers, unavailable audio, blocked storage, reduced motion, and asset/subpath validity.
 
-- index.html — game shell and original SVG illustrations
-- style.css — storybook design, mobile layout, animations
-- game.js — chapters, dialogue, choices, state, and mini-games
+These tests do not verify browser rendering, physical-device gestures, or perceived animation smoothness. Browser visual review remains a separate check.
 
-No framework is required.
+## Files
 
-## Credits
+- `index.html` — book shell, navigation, and about dialog
+- `style.css` — hardcover, spread layouts, typography, and animations
+- `game.js` — twelve-page story, page turns, timing, sound, and progress
+- `assets/chapters-*.png` — three illustrated sheets, each containing four unique scenes; CSS displays one quadrant per page
+- `assets/banana.svg` and `assets/flying-banana.svg` — favicon and final banana animation
+- `tests/storybook.test.cjs` — automated interaction checks
 
-A family-friendly original interactive romantic comedy. No bananas were harmed (allegedly).
+Illustrations were generated for this story with OpenAI image generation. The story is family-friendly, with dating and marriage humor written for adults. No bananas were harmed. Emotionally? Maybe.

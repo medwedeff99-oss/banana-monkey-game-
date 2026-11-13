@@ -1,0 +1,12 @@
+{
+  "name": "banana-monkey-storybook",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A twelve-page illustrated jungle romantic comedy. Static, buildless, GitHub Pages compatible.",
+  "scripts": {
+    "test": "node --test tests/storybook.test.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}

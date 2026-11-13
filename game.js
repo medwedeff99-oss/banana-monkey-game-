@@ -1,106 +1,523 @@
-(function(){
+/* Banana Monkey — a twelve-page picture book. No network calls or build step. */
 "use strict";
-var game=document.getElementById("game");
-var toastEl=document.getElementById("toast");
-var CHAPTERS=[
-["The Quest Begins","Single and Going Bananas","Every legendary love story starts somewhere. This one starts with a lonely monkey, a suspicious dating app, and absolutely no dignity.","Once upon a time, in a jungle with excellent Wi-Fi..."],
-["Profile Panic","Professional Banana Inspector","Milo has been single for 26 monkey years. His mom says he's a catch. His dating history says otherwise.","He thinks this is a professional headshot."],
-["Swipe Right, Swing Left","The Dating Jungle","Welcome to BANANAR: where true love is one swipe away, and so is someone selling you banana insurance.","Milo's standards are slipping."],
-["It's a Match!","The World's Worst Pickup Line","Against all odds, Milo matches with Luna. She's adorable, witty, and apparently has a weakness for truly terrible jokes.","Two phones. Zero social skills."],
-["First Date Fiasco","Love at First Slip","Their first meeting is at the fanciest banana café in the jungle. Milo is determined to make an unforgettable impression.","The café has an unfortunate floor policy."],
-["Trouble in Paradise","Enter Bruno the Gorilla","Just when everything is going wonderfully, the loudest gorilla in the jungle arrives with an enormous bouquet and absolutely no indoor voice.","There goes the romantic music."],
-["Banana Battle Royale","Two Monkeys, One Crush","Bruno challenges Milo to three ridiculous contests. Luna is mostly here for the entertainment.","The most unnecessary competition in jungle history."],
-["The Big Misunderstanding","Wait, You're NOT Dating Him?","Milo sees Bruno and Luna talking, leaps to the wrong conclusion, and performs the world's least graceful dramatic exit.","Communication: a radical new concept."],
-["Put a Ring on It","The Banana Proposal","Under the jungle sunset, Milo has one shot at a perfect proposal. Naturally, he packed the wrong box.","A very romantic logistical error."],
-["The Jungle Wedding","I Do. A-Peel-ingly.","All their friends are here. The cake is enormous. The officiant is crying. What could possibly go wrong?","Bruno has one job. Just one."],
-["The End?","Happily Ever After","Milo found his soulmate. Luna found her favorite weirdo. And Bruno finally found a purpose: dramatically sobbing at weddings.","Roll those suspiciously early credits."],
-["Surprise!","ONE YEAR LATER...","Just when you thought the story was over, the jungle delivers one tiny, shrieking plot twist.","The sequel nobody was emotionally prepared for."]
+const STORY = [
+  {
+    title: "The lonely <em>monkey.</em>",
+    kicker: "SINGLE. VERY SINGLE.",
+    narration:
+      "Milo was single, and his mom had already named his future grandchildren.",
+    lines: [["Milo", "“Mom, I can’t even afford premium bananas!”"]],
+    caption: "A ROMANCE WITH A LIMITED BUDGET",
+    alt: "Milo panics on a phone call with his mother in a cramped treehouse, surrounded by bills, a dying plant, and one lonely banana.",
+  },
+  {
+    title: "Love at first <em>swipe.</em>",
+    kicker: "WELCOME TO BANANAR",
+    narration:
+      "He joined BANANAR and accidentally matched with a literal banana.",
+    lines: [
+      [
+        "Profile",
+        "“Professional Banana Inspector · Emotionally available · Financially questionable”",
+      ],
+    ],
+    caption: "GREAT PROFILE. ZERO CONVERSATION.",
+    alt: "Milo stares at his phone in disbelief across a candlelit table from a real banana wearing a bow tie.",
+  },
+  {
+    title: "An a-peeling <em>match.</em>",
+    kicker: "THEN ALONG CAME LUNA",
+    narration: "Luna: a monkey with standards—apparently flexible ones",
+    lines: [
+      ["Milo", "“Are you a banana? Because you’re a-peeling.”"],
+      ["Luna", "“That was awful—when are you free?”"],
+    ],
+    caption: "THE BAR WAS LOW. HE TRIPPED OVER IT.",
+    alt: "Nervous Milo presents a banana bouquet to Luna on a sunset park bench; Luna raises a sarcastic eyebrow, her red bow bright in her hair.",
+  },
+  {
+    title: "He fell. <em>Hard.</em>",
+    kicker: "THE FIRST DATE",
+    narration:
+      "At the banana café, Milo slipped on a peel and sent his smoothie into low orbit.",
+    lines: [["Luna", "“You really fell for me, huh?”"]],
+    caption: "SMOOTHIE: 1. DIGNITY: 0.",
+    alt: "Milo flies backward through the air over a banana peel as his pink smoothie arcs above him; Luna laughs at her café table and a frog waiter looks horrified.",
+    effect: "slip",
+  },
+  {
+    title: "His last <em>banana.</em>",
+    kicker: "THE GOOD KIND OF BANANAS",
+    narration: "They laughed, dated, and cuddled beneath the stars.",
+    lines: [
+      [
+        "Narrator",
+        "“For the first time, Milo found someone worth sharing his last banana with.”",
+      ],
+    ],
+    caption: "THIS WAS FINANCIALLY SIGNIFICANT.",
+    alt: "Milo and Luna cuddle on a picnic blanket under a star-filled jungle sky, laughing and sharing one last banana while an owl looks away.",
+    effect: "hearts",
+  },
+  {
+    title: "Enter <em>Bruno.</em>",
+    kicker: "47 BANANAS. NO SELF-AWARENESS.",
+    narration: "Bruno: 47 bananas and the confidence of a man never told “no”",
+    lines: [
+      [
+        "Bruno",
+        "“Hey beautiful—I own three trees and have zero emotional baggage.”",
+      ],
+      ["Milo", "“I own a houseplant—it’s dying.”"],
+    ],
+    caption: "REAL ESTATE IS NOT A PERSONALITY.",
+    alt: "Huge purple-shirted gorilla Bruno makes a heroic entrance carrying a mountain of bananas; tiny Milo holds a pathetic dying houseplant and Luna looks unimpressed.",
+  },
+  {
+    title: "A very smooth <em>move.</em>",
+    kicker: "TWO MEN. ONE SHARED BRAIN CELL.",
+    narration: "Bruno flirted; Milo challenged him.",
+    lines: [
+      [
+        "Narrator",
+        "Bruno flexed out of his shirt; Milo backflipped directly into a banana smoothie.",
+      ],
+    ],
+    caption: "NEITHER HAD A BACKUP PLAN.",
+    alt: "Bruno flexes so hard his purple sleeves rip while upside-down Milo lands headfirst in a giant pink smoothie; Luna facepalms in the background.",
+    effect: "chaos",
+  },
+  {
+    title: "Three trees. <em>One idiot.</em>",
+    kicker: "A SMALL MISUNDERSTANDING",
+    narration: "A misunderstanding, a kiss, and absolutely no competition",
+    lines: [
+      ["Luna", "“Milo! I don’t want a gorilla!”"],
+      ["Milo", "“But he has THREE TREES!”"],
+      ["Luna", "“And apparently ONE brain cell!”"],
+    ],
+    caption: "COMMUNICATION. AN UNEXPECTED CONCEPT.",
+    alt: "Luna holds Milo’s face and kisses his cheek on a moonlit footbridge; both laugh, with pink smoothie still in his hair and Bruno fussing over trees far behind.",
+  },
+  {
+    title: "The wrong <em>pocket.</em>",
+    kicker: "THE PROPOSAL",
+    narration: "One knee, one ring box… one tiny banana",
+    lines: [
+      ["Luna", "“Is that… a banana?”"],
+      ["Milo", "“Wrong pocket—WAIT!”"],
+      ["Luna", "“YES!”"],
+    ],
+    caption: "HE FOUND THE RING. EVENTUALLY.",
+    alt: "Milo kneels in a fairy-lit garden and opens a velvet box containing a tiny banana, frantically searching his other pocket for the real ring as Luna laughs.",
+  },
+  {
+    title: "I now pronounce you <em>bananas.</em>",
+    kicker: "THE JUNGLE WEDDING",
+    narration:
+      "They married beneath the banana trees, with Bruno officiating and crying hysterically.",
+    lines: [["Bruno", "“You may now kiss your… sniff… banana.”"]],
+    caption: "SOMETHING BORROWED. SOMETHING BRUNO.",
+    alt: "Milo and Luna kiss under a jungle wedding arch; Luna wears her red bow and a veil, while purple-shirted Bruno officiates behind them, sobbing into a tissue.",
+    effect: "hearts",
+  },
+  {
+    title: "Happily <em>ever after.</em>",
+    kicker: "AND SO, DEAR READER…",
+    narration: "And they lived happily ever after.",
+    lines: [["Narrator", "The end."]],
+    caption: "A COMPLETELY NORMAL ENDING.",
+    alt: "Married Milo and Luna sit together on a tree branch beneath a banana-shaped moon, tails curling into a heart against a vast peaceful starry sky.",
+    effect: "ending",
+  },
+  {
+    title: "A very small <em>plot twist.</em>",
+    kicker: "ONE YEAR LATER…",
+    narration: "Peel Jr.: banana-peel hat, excellent aim, absolutely no income",
+    lines: [
+      ["Bruno", "“WAIT! YOU TWO MADE A MINI MONKEY?!”"],
+      ["Milo", "“I thought marriage was bananas.”"],
+      ["Luna", "“Wait until you see the diaper bill.”"],
+    ],
+    caption: "THE END. FOR REAL. 🍌",
+    alt: "Luna cradles baby Peel Jr., who wears a banana-peel hat and throws a banana toward the reader; exhausted Milo holds a huge diaper bill while Bruno bursts through the nursery window.",
+    effect: "baby",
+  },
 ];
-var PROFILES=[
-{name:"Bananthony",age:"34",emoji:"🍌",bio:"A-peeling entrepreneur. Looking for somebody to share my banana peel collection.",tags:["Owns 700 peels","Still lives with bunch"]},
-{name:"Chimp Kardashian",age:"29",emoji:"🐵",bio:"No drama. Except the 17 times I've appeared on Jungle Court.",tags:["Influencer","It's complicated"]},
-{name:"Peelvis",age:"52",emoji:"🎤",bio:"Hunka hunka burning banana. I sing only about my ex.",tags:["Banana rockstar","Sings on dates"]},
-{name:"Luna",age:"25",emoji:"🐒",bio:"Banana milkshake enthusiast. Looking for someone who makes me laugh more than my pet parrot.",tags:["Loves sunsets","Hates bad puns (allegedly)"]}
-];
-var CHALLENGES=[
-{title:"ROUND 1: THE BOUQUET OFF",intro:"Bruno brought 47 bananas. Milo has to improvise.",options:[["🍌","One banana, with a tiny bow"],["🌳","An entire banana tree (some assembly required)"],["🧦","A sock filled with banana chips"]],responses:["Luna laughs: 'It's the thought that counts. The *small* thought.'","The tree collapses directly onto Bruno. Luna gives your effort a 10/10.","Bruno screams: 'WHY IS IT WARM?!' The judges are concerned."]},
-{title:"ROUND 2: THE DANCE FLOOR",intro:"Bruno starts flexing in rhythm. Milo has a dangerous idea.",options:[["🕺","Do the Wobbly Banana"],["🦍","Attempt Bruno's muscle dance"],["💃","Ask Luna to dance together"]],responses:["Milo accidentally invents a dance that looks like escaping a spider. Standing ovation.","Milo flexes so hard his shirt button flies into the smoothie machine.","Luna takes your hand. Bruno dances with a palm tree. The tree wins."]},
-{title:"ROUND 3: THE BIG LINE",intro:"The final test: make Luna laugh.",options:[["🍯","'I may be little, but my heart's a whole bunch.'"],["🪨","'My muscles are… emotionally powerful.'"],["💘","'You're the only monkey I'd share my last banana with.'"]],responses:["Luna: 'Okay, that's actually adorable.' Bruno pretends not to cry.","Bruno: 'That's my line!' He files an imaginary copyright complaint.","Luna blushes: 'Now THAT is true love.' Bruno eats the microphone."]}
-];
-var defaults={chapter:0,profile:0,profileChoice:"",line:null,slipped:false,brunoReply:null,round:0,roundResult:null,roundAnswers:[],reconcile:null,proposal:0,vow:null,creditTrigger:false,baby:false,sound:false};
-var state=Object.assign({},defaults);
-try{var old=JSON.parse(localStorage.getItem("bananar-story-v2")||"null");if(old&&Number.isInteger(old.chapter)&&old.chapter>=0&&old.chapter<12){state=Object.assign(state,old);}}catch(e){}
-var creditsTimer=null,toastTimer=null,audioCtx=null;
-function persist(){try{localStorage.setItem("bananar-story-v2",JSON.stringify(state));}catch(e){}}
-function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
-function beep(type){if(!state.sound)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();var o=audioCtx.createOscillator(),g=audioCtx.createGain(),n=audioCtx.currentTime;o.type="sine";o.frequency.setValueAtTime(type==="happy"?600:350,n);o.frequency.exponentialRampToValueAtTime(type==="happy"?880:200,n+.16);g.gain.setValueAtTime(.045,n);g.gain.exponentialRampToValueAtTime(.001,n+.24);o.connect(g);g.connect(audioCtx.destination);o.start(n);o.stop(n+.25);}catch(e){}}
-function toast(s){clearTimeout(toastTimer);toastEl.textContent=s;toastEl.classList.add("show");toastTimer=setTimeout(function(){toastEl.classList.remove("show");},2900);}
-function button(text,act,value,cls){return '<button type="button" class="btn '+(cls||"btn-primary")+'" data-do="'+act+'"'+(value===undefined?"":' data-value="'+esc(value)+'"')+'>'+text+'</button>';}
-function choice(emoji,text,act,value){return '<button type="button" class="choice" data-do="'+act+'" data-value="'+esc(value)+'"><span class="choice-emoji">'+emoji+'</span><span>'+esc(text)+'</span></button>';}
-function dlg(name,text,luna){return '<div class="dialogue'+(luna?" luna-dialogue":"")+'"><span class="speaker">'+esc(name)+'</span><p>'+text+'</p></div>';}
-function go(n){clearTimeout(creditsTimer);state.chapter=Math.max(0,Math.min(11,n));persist();beep("happy");render();window.scrollTo({top:0,behavior:"smooth"});}
-function back(){if(state.chapter===0)return;go(state.chapter-1);}
-function reset(){clearTimeout(creditsTimer);state=Object.assign({},defaults,{roundAnswers:[],sound:state.sound});persist();render();toast("A fresh bunch. A fresh chance at love. 🍌");}
-function sprite(id,x,y,w,h,klass){return '<use href="#'+id+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" class="'+(klass||"bob")+'"/>';}
-function bananas(x,y,w,h){return sprite("banana",x,y,w||68,h||48,"sway");}
-function hearts(x,y){return sprite("heart",x,y,52,47,"heart-float")+sprite("heart",x+58,y+40,30,27,"heart-float two");}
-function cafe(){return '<g><path d="M25 450L760 450" stroke="#386d47" stroke-width="12"/><path d="M470 395L448 552M626 395L650 552" stroke="#764724" stroke-width="16"/><rect x="390" y="385" width="324" height="27" rx="12" fill="#cb894a" stroke="#7f4d29" stroke-width="6"/><path d="M447 385L447 329Q462 313 477 329L477 385M630 385L630 329Q645 313 660 329L660 385" stroke="#c0e8df" stroke-width="12" fill="#fff5cc"/><path d="M459 323L466 298M642 322L635 302" stroke="#d46f69" stroke-width="6"/><ellipse cx="539" cy="391" rx="44" ry="12" fill="#fff0b9"/></g>'+bananas(501,353,71,49);}
-function bouquet(){var a='<g class="bounce"><path d="M630 315L696 430L749 313Z" fill="#ffb4bb" stroke="#d87683" stroke-width="6"/>';for(var i=0;i<7;i++){a+=bananas(621+(i%4)*34,260+Math.floor(i/4)*34,87,58);}return a+"</g>";}
-function arch(){return '<path d="M260 490L260 196Q452 1 670 196L670 490" stroke="#b89a51" stroke-width="22" fill="none"/><path d="M260 320Q250 175 320 129M670 319Q681 180 615 124" stroke="#578250" stroke-width="20" fill="none"/>'+Array.from({length:8},function(_,i){var xx=i%2===0?250:640;return '<circle cx="'+(xx+(i%3)*9)+'" cy="'+(182+Math.floor(i/2)*68)+'" r="15" fill="'+(i%2?"#fff4a7":"#ff9c9e")+'" stroke="#ffe6a6" stroke-width="4"/>';}).join("");}
-function baseArt(n){var night=(n===8||n===10);var sky=night?"#f4a26b":"#a9ddd0",sky2=night?"#6d8b91":"#e8f1b9";
-return '<svg class="scene-svg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice" role="img" aria-label="'+esc(CHAPTERS[n][3])+'" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sky'+n+'" x1="0" x2="0" y1="0" y2="1"><stop stop-color="'+sky+'"/><stop offset="1" stop-color="'+sky2+'"/></linearGradient><linearGradient id="ground'+n+'" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#7bb87b"/><stop offset="1" stop-color="#3b7c4e"/></linearGradient></defs><rect width="900" height="600" fill="url(#sky'+n+')"/><circle cx="738" cy="112" r="80" fill="'+(night?"#ffe6a6":"#fff4bd")+'" opacity=".81"/><path d="M0 338Q160 195 340 338T685 302T900 308L900 600L0 600Z" fill="#8ebd89" opacity=".6"/><path d="M0 405Q180 310 382 396T900 348V600H0Z" fill="#75ad7b"/><path d="M0 492Q300 410 485 484T900 461V600H0Z" fill="url(#ground'+n+')"/><path d="M0 587Q130 531 230 566T470 557T900 565V600H0Z" fill="#37734c" opacity=".6"/><g opacity=".85" class="art-cloud"><ellipse cx="185" cy="100" rx="74" ry="25" fill="#fffdf0"/><ellipse cx="225" cy="90" rx="56" ry="32" fill="#fffdf0"/><ellipse cx="143" cy="93" rx="36" ry="24" fill="#fffdf0"/></g><g opacity=".65" class="art-cloud"><ellipse cx="570" cy="171" rx="80" ry="20" fill="#fffdf0"/><ellipse cx="533" cy="158" rx="42" ry="24" fill="#fffdf0"/></g><path d="M10 600Q61 375 17 180" stroke="#875d35" stroke-width="39" fill="none"/><path d="M888 600Q825 368 890 158" stroke="#875d35" stroke-width="43" fill="none"/><path d="M13 199Q60 130 173 140Q91 189 60 230Q51 133 11 199M17 185Q86 170 129 241Q56 236 20 199M16 196Q110 70 211 88Q91 156 16 196" fill="#2a7653" stroke="#286e4c" stroke-width="6"/><path d="M887 161Q810 70 713 100Q817 139 864 207M887 172Q806 170 754 244Q824 234 884 195M887 163Q780 64 652 71Q818 151 887 163" fill="#377c56" stroke="#286e4c" stroke-width="6"/><path d="M4 4Q140 5 192 33Q98 61 20 39M905 3Q794 10 724 40Q839 69 903 36" fill="#2c8e60" stroke="#225e45" stroke-width="9"/>'+bananas(41,202,84,59)+bananas(777,183,77,54)+'<g fill="#ffd877"><circle cx="113" cy="524" r="7"/><circle cx="810" cy="493" r="6"/><circle cx="759" cy="553" r="7"/></g><g fill="#f19382"><circle cx="109" cy="526" r="3"/><circle cx="809" cy="494" r="3"/></g>';}
-function sceneArt(n){
-var a=baseArt(n), bubble="";
-if(n===0){a+=sprite("milo",109,182,245,329)+sprite("luna",414,174,238,324)+sprite("bruno",676,221,175,236)+hearts(370,79)+bananas(392,349,90,62);bubble="I downloaded WHAT?";}
-if(n===1){a+=sprite("milo",76,198,264,356)+'<rect x="455" y="129" width="260" height="355" rx="33" fill="#213c2d" stroke="#ffe1a4" stroke-width="10"/><rect x="469" y="174" width="231" height="286" rx="18" fill="#fff9d7"/><rect x="471" y="174" width="228" height="52" rx="10" fill="#36765b"/><text x="585" y="207" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="24" fill="#fff">BANANAR</text><text x="584" y="272" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="22" fill="#36503d">MILO, 26</text><text x="584" y="308" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="15" fill="#67725d">BANANA INSPECTOR</text>'+bananas(530,329,120,90);bubble="My mom says I am a catch!";}
-if(n===2){a+=sprite("milo",73,208,240,325)+'<rect x="448" y="120" width="270" height="352" rx="33" fill="#31543d" stroke="#ffecc0" stroke-width="9"/><rect x="462" y="157" width="243" height="289" rx="13" fill="#fff8dd"/><text x="583" y="194" text-anchor="middle" font-size="25" font-family="sans-serif" font-weight="bold" fill="#a06c36">SWIPE!</text>'+sprite("heart",501,233,165,146,"heart-float")+bananas(524,369,103,74);bubble=state.profile>=3?"Wait... SHE'S PERFECT!":"Swipe responsibly. Or don't.";}
-if(n===3){a+=sprite("milo",130,200,250,335)+sprite("luna",530,191,243,332)+hearts(413,106)+'<path d="M373 293Q454 253 519 297" fill="none" stroke="#f9ea97" stroke-width="11" stroke-dasharray="12 18"/>';bubble="She's texting me BACK?!";}
-if(n===4){a+=sprite("milo",96,state.slipped?335:228,state.slipped?290:223,state.slipped?214:299,"bob")+sprite("luna",616,180,233,314)+cafe()+bananas(199,480,100,69);bubble=state.slipped?"Did you just propose to the floor?":"Act normal, Milo!";}
-if(n===5){a+=sprite("milo",36,249,218,285)+sprite("luna",283,205,223,303)+sprite("bruno",547,127,305,412)+bouquet();bubble="I brought 47 bananas, BABE!";}
-if(n===6){a+=sprite("milo",95,226,252,339)+sprite("bruno",558,139,302,407)+'<path d="M371 319l38 -42 39 42 -39 42Z" fill="#ffe47b" stroke="#ab8433" stroke-width="7"/><text x="408" y="334" text-anchor="middle" font-size="24" font-family="sans-serif" font-weight="bold" fill="#824d27">VS</text>'+bananas(367,401,124,91);bubble="LET'S GET READY TO RUMBLE!";}
-if(n===7){a+=sprite("milo",44,250,230,305)+sprite("luna",416,195,231,311)+sprite("bruno",677,222,177,242)+'<path d="M350 197l-13 -35m13 35l24 -30" stroke="#fff7c0" stroke-width="9" stroke-linecap="round"/>';bubble="I called my fridge gorgeous too!";}
-if(n===8){a+=sprite("milo",152,232,218,298)+sprite("luna",486,170,257,353)+hearts(373,103)+sprite("ring",359,398,85,91,"bounce");bubble=state.proposal===0?"I have one question...":state.proposal===1?"Why is there a BANANA in here?!":"Will you marry me, Luna?";}
-if(n===9){a+=arch()+sprite("milo",287,241,199,273)+sprite("luna",441,209,228,309)+sprite("bruno",54,243,169,226)+hearts(378,109)+'<rect x="740" y="384" width="100" height="82" rx="13" fill="#fff5e5" stroke="#f5c0b7" stroke-width="8"/><rect x="727" y="361" width="127" height="37" rx="11" fill="#fff5e5" stroke="#f5c0b7" stroke-width="8"/>'+bananas(755,330,68,48);bubble="You may now kiss your... banana?!";}
-if(n===10){a+=sprite("milo",244,213,257,346)+sprite("luna",463,210,244,332)+hearts(385,115)+'<path d="M159 552Q446 480 779 551" stroke="#eae0a1" stroke-width="11" fill="none"/>';bubble="THE END... probably.";}
-if(n===11){a+=sprite("milo",32,219,225,309)+sprite("luna",258,216,235,312)+sprite("baby",400,336,176,201,"bounce")+sprite("bruno",634,191,253,342)+bananas(358,493,185,127)+hearts(387,85);bubble="YOU TWO MADE A MINI MONKEY?!";}
-a+='</svg>';return '<div class="art-panel">'+a+'<span class="floating-tag">🍌 '+(["A Jungle Love Story","THE PROFILE","THE SWIPE ZONE","INBOX (1)","BANANA CAFÉ","UNEXPECTED GUEST","BANANA GAMES","DRAMA!","SUNSET PROPOSAL","WEDDING DAY","THE CREDITS","PLOT TWIST!"][n])+'</span>'+(bubble?'<div class="speech-bubble">'+esc(bubble)+'</div>':"")+'<span class="scene-label">'+esc(CHAPTERS[n][3])+'</span><div class="foliage-shadow"></div></div>';
+const $ = (id) => document.getElementById(id);
+const media = window.matchMedia("(max-width: 700px)");
+const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const STORAGE = "banana-monkey-storybook-v2";
+let cursor = -1,
+  revealed = false,
+  cryReady = false,
+  busy = false,
+  audioOn = false,
+  audioContext,
+  cryTimer,
+  flipTimer,
+  actionTimer,
+  pointerStart;
+function readSaved() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE) || "null");
+    if (
+      saved &&
+      Number.isInteger(saved.cursor) &&
+      saved.cursor >= -1 &&
+      saved.cursor < 12
+    ) {
+      cursor = saved.cursor;
+      revealed = saved.revealed === true;
+    }
+  } catch {}
 }
-function nav(nextText,canNext){return '<div class="footer-nav">'+button("← Previous","back",undefined,"btn-ghost")+'<span class="hint">Use your choices to move the story</span>'+(canNext?button(nextText||"Next page →","next",undefined,"btn-green"):'<span class="hint">🐒 Choose an action ↑</span>')+'</div>';}
-function pageIntro(){return '<div class="big-icon">🐒 💘 🍌</div><span class="cover-tag">100% ridiculous • 100% family friendly</span><h1>Banana Monkey<br>Love Quest!</h1><p class="story-text">One awkward monkey. One wonderful girl. One obnoxiously enormous gorilla. And enough bananas to ruin several relationships.</p>'+dlg("Narrator","In the jungle, love is wild. Dating apps are somehow worse.",false)+'<div class="float-badges"><span>🐵 12 illustrated scenes</span><span>🎮 Silly mini-games</span><span>💛 Surprise ending</span></div><div class="story-spacer"></div><div class="action-stack">'+button("🍌 Start the love quest →","next",undefined,"btn-primary")+button("↻ Start from the beginning","restart",undefined,"btn-outline")+'</div>';}
-function pageProfile(){return '<p class="eyebrow">Chapter 1 · The desperate introduction</p><h2>Meet Milo. <em>He is single.</em></h2><p class="story-text">Milo has joined <strong>BANANAR</strong>, the jungle dating app for monkeys who believe in love (and have internet access).</p><div class="profile-setup"><strong>🐵 Milo, 26</strong><p>Occupation: Professional Banana Inspector</p><p>Relationship status: Emotionally available. Financially questionable.</p><p>Fun fact: Once fell in love with a fruit bowl.</p></div>'+dlg("Milo","I need a profile headline. Something cool. Something mysterious.",false)+'<div class="choice-list">'+choice("🍌","'I have a stable branch. And 4 bananas.'","profile-headline","branch")+choice("😎","'Six-pack? No. Six bananas? Absolutely.'","profile-headline","six")+choice("💛","'Looking for someone to share my last banana.'","profile-headline","last")+'</div>';}
-function pageSwipes(){var p=PROFILES[Math.min(3,state.profile)];return '<p class="eyebrow">Chapter 2 · Swipe responsibly</p><h2>Welcome to the dating jungle.</h2><p class="story-text">Milo\'s thumb is ready. His dignity is not.</p><div class="phone-card"><div class="phone-top">🍌 BANANAR <small>FIND YOUR PERFECT BUNCH</small></div><div class="phone-body"><div class="profile-emoji">'+p.emoji+'</div><div class="profile-title">'+esc(p.name)+', '+esc(p.age)+'</div><div class="profile-description">'+esc(p.bio)+'</div><div class="profile-badges">'+p.tags.map(function(t){return "<span>"+esc(t)+"</span>";}).join("")+'</div><div class="swipe-buttons"><button type="button" class="nope" data-do="swipe" data-value="no" aria-label="Pass">✖</button><button type="button" class="like" data-do="swipe" data-value="yes" aria-label="Like">♥</button></div><div class="counter">PROFILE '+(Math.min(3,state.profile)+1)+' OF 4</div></div></div>';}
-function pageChat(){var replies=["Luna: 'That was terrible. Unfortunately, I laughed.'","Luna: 'Wow. Straight to poetry? Are you an undercover banana?'","Luna: 'That's such a terrible line that I kind of love it.'"];var lines=["Are you a banana? Because I find you a-peeling.","Do you believe in love at first swipe or should I unmatch and swipe again?","I inspect bananas for a living. But you're the real catch."];return '<p class="eyebrow">Chapter 3 · It\'s a match!</p><h2>She actually swiped right!</h2><p class="story-text">Milo\'s heart races. His brain exits the building. Time to impress Luna.</p><div class="chat-window"><div class="chat-header">🌺 Luna • online now 🟢</div><div class="chat-body"><div class="chat-time">Today, 6:47 PM</div><div class="chat-line">Hey Milo! Cute monkey. Are you really a banana inspector? 😂</div>'+(state.line!==null?'<div class="chat-line me">'+esc(lines[state.line])+'</div><div class="chat-line">'+esc(replies[state.line])+'</div>':"")+'</div></div>'+(state.line===null?'<div class="choice-list">'+lines.map(function(t,i){return choice(["🍌","🐒","💛"][i],t,"line",i);}).join("")+'</div>':dlg("Milo","SHE REPLIED! Somebody contact the jungle newspaper!",false)+'<div class="action-stack">'+button("Ask her on a real date →","next",undefined,"btn-primary")+'</div>');}
-function pageDate(){return '<p class="eyebrow">Chapter 4 · First date</p><h2>Love at first... slip?</h2><p class="story-text">Luna arrives looking amazing. Milo arrives looking like he practiced walking in the mirror.</p>'+dlg("Luna","You look exactly like your pictures. Except you have more arms.",true)+(state.slipped?dlg("Luna","Do you always fall for girls this fast?",true)+dlg("Milo","Only the ones with excellent health insurance.",false)+'<div class="outcome">🎉 +100 ROMANCE. −100 KNEECAPS. Luna can\'t stop laughing.</div><div class="action-stack">'+button("Keep this date going →","next",undefined,"btn-primary")+'</div>':'<div class="profile-setup">🍌 <strong>WARNING: BANANA PEEL AHEAD</strong><p>Help Milo take one confident step toward Luna. This is definitely fine.</p></div>'+button("Take one smooth, totally normal step →","slip",undefined,"btn-primary"));}
-function pageBruno(){return '<p class="eyebrow">Chapter 5 · A very large problem</p><h2>Enter Bruno.</h2><p class="story-text">A massive gorilla bursts into the café carrying <strong>47 bananas arranged like roses</strong>. The floor visibly trembles.</p>'+dlg("Bruno","Hey gorgeous. Ever dated a guy with his own tree?",false)+dlg("Milo","I have a... very impressive houseplant.",false)+(state.brunoReply===null?'<p class="small-story">What should Milo do?</p><div class="choice-list">'+choice("🍌","Challenge his bouquet with ONE fancy banana.","bruno","banana")+choice("😤","Flex dramatically and hope nobody notices.","bruno","flex")+choice("😂","Ask if those bananas come with free delivery.","bruno","delivery")+'</div>':'<div class="outcome pink">'+esc(state.brunoReply==="banana"?"Bruno holds up 47 bananas. Milo proudly holds up 1. Luna photographs both.":state.brunoReply==="flex"?"Milo flexes. Something squeaks. It was his elbow.":"Bruno: 'EXPRESS SHIPPING ONLY.' Luna snorts her milkshake.")+'</div>'+button("This means WAR →","next",undefined,"btn-primary"));}
-function pageBattle(){var r=state.round;var c=CHALLENGES[Math.min(2,r)];if(r>2){return '<p class="eyebrow">Chapter 6 · The results</p><h2>The most chaotic battle ever.</h2><p class="story-text">Nobody knows who won. The café is covered in smoothies. A banana tree has applied for workers\' compensation.</p><div class="score-stamp">🏆 LUNA\'S VOTE: MILO (obviously)</div>'+dlg("Luna","I like you, Milo. Not because you won. Because you\'re the only guy who actually asked what I wanted.",true)+button("Continue the love story →","next",undefined,"btn-primary");}
-return '<p class="eyebrow">Chapter 6 · Gorilla versus monkey</p><h2>Banana Battle Royale!</h2><p class="story-text">Three games. One girl. Zero sensible adults.</p><div class="challenge-head"><span class="challenge-number">'+(r+1)+'</span><p>'+esc(c.title)+'</p></div><p class="story-text">'+esc(c.intro)+'</p>'+(state.roundResult===null?'<div class="choice-list">'+c.options.map(function(o,i){return choice(o[0],o[1],"battle",i);}).join("")+'</div>':'<div class="outcome"><span class="big">🎭 WHAT JUST HAPPENED?!</span>'+esc(c.responses[state.roundResult])+'</div><div class="action-stack">'+button(r===2?"See who won →":"Next ridiculous challenge →","next-round",undefined,"btn-primary")+'</div>')+'<div class="counter">ROUND '+(r+1)+' / 3</div>';}
-function pageDrama(){return '<p class="eyebrow">Chapter 7 · Total emotional disaster</p><h2>Wait... you\'re NOT dating him?</h2><p class="story-text">Milo sees Luna chatting with Bruno and runs away in dramatic slow motion. He trips twice. Both times on the same banana.</p>'+dlg("Luna","Milo! Bruno just offered me a job promoting his banana gym!",true)+dlg("Bruno","I call everybody gorgeous. INCLUDING MY REFRIGERATOR.",false)+(state.reconcile===null?'<div class="choice-list">'+choice("😳","'So... I may have overreacted by approximately a lot.'","reconcile","sorry")+choice("🍌","'I got jealous. I can explain. Actually, no I can\'t.'","reconcile","jealous")+choice("💛","'I really like you, Luna. Can we start again?'","reconcile","honest")+'</div>':'<div class="outcome">'+esc(state.reconcile==="sorry"?"Luna: 'Approximately a lot, yes.' She reaches for Milo's hand.":state.reconcile==="jealous"?"Luna: 'At least you're honest. Also, please stop fighting household appliances.'":"Luna smiles: 'I never wanted anyone else, silly monkey.'")+'</div>'+button("Make it up to Luna →","next",undefined,"btn-primary"));}
-function pageProposal(){return '<p class="eyebrow">Chapter 8 · The big question</p><h2>A very a-peeling proposal.</h2><p class="story-text">Fireflies sparkle. The sun sets. Milo gets down on one knee, holds out a velvet box, and gives his best romantic speech.</p>'+dlg("Milo","Luna, you made my whole jungle feel like home. Will you...",false)+(state.proposal===0?button("💍 Open the ring box →","proposal",undefined,"btn-primary"):state.proposal===1?'<div class="outcome pink"><span class="big">🍌 IT\'S A MINIATURE BANANA.</span>Luna: "Milo... is that a banana?"<p class="small-story">Milo: "OH NO. THAT\'S MY EMERGENCY SNACK."</p></div>'+button("Quick! Find the ACTUAL ring! →","proposal",undefined,"btn-primary"):dlg("Luna","YES! A thousand times yes! But can we keep the emergency banana?",true)+'<div class="outcome">💍 ENGAGED! Bruno can be heard sobbing from three miles away.</div>'+button("Plan the jungle wedding →","next",undefined,"btn-primary"));}
-function pageWedding(){return '<p class="eyebrow">Chapter 9 · Wedding day</p><h2>Here comes the banana bride!</h2><p class="story-text">An enchanted jungle, a mountain of cake, and Bruno officiating in a purple shirt that somehow gets even louder.</p>'+dlg("Bruno, crying hysterically","Do you... *sniff*... promise to... *SOB*... love each other forever?",false)+(state.vow===null?'<p class="small-story">Pick Milo\'s wedding vow:</p><div class="choice-list">'+choice("💛","'I promise to share my last banana with you.'","vow","last")+choice("😂","'For richer or poorer. Mostly poorer. I buy bananas.'","vow","poor")+choice("🌸","'I choose you in every jungle, every lifetime.'","vow","life")+'</div>':'<div class="wedding-vows">"You may now kiss your... <em>BANANA?!</em>"<br>💋 🍌 💐</div><div class="outcome">🎉 JUST MARRIED! Bruno cries so hard the wedding cake gets soggy.</div>'+button("See the happy ending →","next",undefined,"btn-primary"));}
-function pageCredits(){return '<p class="eyebrow">Chapter 10 · An ending, probably</p><h2>And they lived happily ever after.</h2><p class="story-text">Milo found his perfect bunch. Luna found a truly lovable idiot. Bruno got a free slice of cake.</p><div class="credits"><p class="ticker">a totally finished motion picture</p><h3>THE END 🍌</h3><p>Starring Milo & Luna</p><p>Special thanks to Bruno the Very Large Gorilla</p><p class="fine">NO BANANAS WERE HARMED*</p><p class="fine">*This is wildly untrue.</p></div><div class="fake-finish">🎬 CREDITS ROLLING... THANKS FOR PLAYING!</div>'+(state.creditTrigger?'<div class="outcome pink"><span class="big">👶 DID SOMETHING JUST CRY?!</span>One year later... the screen trembles.</div>'+button("Wait... WHAT was that noise?! →","next",undefined,"btn-pink"):'<p class="small-story" style="text-align:center">Psst. Stay through the credits. Something strange is about to happen.</p>');}
-function pageBaby(){return '<div class="ending-banner">🚨 PLOT TWIST! 🚨</div><p class="eyebrow">Chapter 11 · One year later...</p><h2>Meet... PEEL JR.!</h2><p class="story-text">A tiny monkey in a banana-peel hat arrives screaming like a malfunctioning jungle alarm.</p>'+dlg("Bruno, crashing through the wall","WAIT! YOU TWO MADE A MINI MONKEY?!",false)+dlg("Milo","I thought marriage was bananas.",false)+dlg("Luna","You haven\'t seen the diaper bills.",true)+'<div class="score-stamp">👶 +1 BABY • +4,000 DIAPERS • −8 HOURS OF SLEEP</div><div class="baby-name">🍌 PEEL JR. 🍌</div><div class="outcome pink"><span class="big">THE END... OR IS IT?</span>Peel Jr. throws a banana right at the screen. Bruno faints. The baby is delighted.</div><div class="action-stack">'+button("🔁 Play the whole ridiculous story again","restart",undefined,"btn-primary")+button("💌 Share this love story","share",undefined,"btn-outline")+'</div>';}
-var PAGES=[pageIntro,pageProfile,pageSwipes,pageChat,pageDate,pageBruno,pageBattle,pageDrama,pageProposal,pageWedding,pageCredits,pageBaby];
-function render(){var n=state.chapter,chapter=CHAPTERS[n];document.getElementById("sound-toggle").textContent=state.sound?"🔊":"🔇";var head='<div class="book-head"><span class="chapter-pill">📖 '+(n===0?"The storybook":"Page "+n+" of 11")+'</span><div class="progress-group"><span>'+(n===0?"Your love quest awaits":Math.round(n/11*100)+"% of the quest")+'</span><span class="progress-track"><span class="progress-fill" style="width:'+Math.round(n/11*100)+'%"></span></span></div></div>';var canNext=n===0?false:false;game.innerHTML=head+'<div class="page-area page-in">'+sceneArt(n)+'<article class="story-panel">'+PAGES[n]()+ '<div class="story-spacer"></div>'+(n===0?"":nav("",false))+'</article></div>';persist();
-if(n===10&&!state.creditTrigger){clearTimeout(creditsTimer);creditsTimer=setTimeout(function(){if(state.chapter===10&&!state.creditTrigger){state.creditTrigger=true;beep("happy");render();toast("PLOT TWIST! A tiny cry echoes from the jungle... 👶");}},5200);}
+function save() {
+  try {
+    localStorage.setItem(STORAGE, JSON.stringify({ cursor, revealed }));
+  } catch {}
 }
-game.addEventListener("click",function(e){var el=e.target.closest("[data-do]");if(!el||!game.contains(el))return;var cmd=el.dataset.do,val=el.dataset.value;beep("click");
-if(cmd==="next"){go(state.chapter+1);return;}
-if(cmd==="back"){back();return;}
-if(cmd==="restart"){reset();return;}
-if(cmd==="profile-headline"){state.profileChoice=val;toast("Profile saved! Jungle charisma +3 🍌");go(2);return;}
-if(cmd==="swipe"){if(state.profile>=3){if(val==="yes"){state.profile=3;toast("IT'S A MATCH! 💖");go(3);}else{toast("Milo regrets that swipe immediately. Give love a second chance!");beep("happy");}return;}toast(val==="yes"?"That profile was... a choice. Next! 😬":"Next! Your soulmate is out there. 🍌");state.profile++;render();return;}
-if(cmd==="line"){state.line=Number(val);render();beep("happy");return;}
-if(cmd==="slip"){state.slipped=true;toast("WHOOPS! Milo has fallen... literally. 🍌");render();return;}
-if(cmd==="bruno"){state.brunoReply=val;render();return;}
-if(cmd==="battle"){state.roundResult=Number(val);state.roundAnswers[state.round]=Number(val);render();return;}
-if(cmd==="next-round"){state.round++;state.roundResult=null;render();return;}
-if(cmd==="reconcile"){state.reconcile=val;render();return;}
-if(cmd==="proposal"){state.proposal++;render();if(state.proposal===2)beep("happy");return;}
-if(cmd==="vow"){state.vow=val;render();return;}
-if(cmd==="share"){var url=location.href;if(navigator.share){navigator.share({title:"Banana Monkey Love Quest 🍌",text:"This ridiculous jungle romance has a VERY unexpected ending.",url:url}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){toast("Link copied! Share the bananas 🍌");}).catch(function(){toast("Copy the address from your browser to share!");});}else{toast("Copy the address from your browser to share!");}return;}
-});
-document.getElementById("sound-toggle").addEventListener("click",function(){state.sound=!state.sound;beep("happy");render();toast(state.sound?"Sound on! 🔊":"Quiet jungle mode 🔇");});
-document.getElementById("restart-top").addEventListener("click",reset);
-document.addEventListener("keydown",function(e){if(e.key==="ArrowLeft"&&state.chapter>0&&!e.repeat)back();if(e.key==="Escape"){toast("Need a banana break? Your progress is saved. 🍌");}});
-render();
-})();
+function alignCursor() {
+  if (cursor === 11) revealed = true;
+  if (!media.matches && cursor >= 0) cursor = Math.floor(cursor / 2) * 2;
+}
+function artMarkup(i) {
+  const sheet = Math.floor(i / 4) + 1,
+    x = i % 2,
+    y = Math.floor((i % 4) / 2);
+  return `<div class="illustration" style="--x:${x};--y:${y}"><span class="loading-art" aria-hidden="true">A little jungle magic…</span><img src="./assets/chapters-${sheet === 1 ? "01-04" : sheet === 2 ? "05-08" : "09-12"}.png" alt="${STORY[i].alt}" draggable="false" decoding="async"><div class="ill-overlay" aria-hidden="true">${i === 3 ? '<span class="sfx sfx-slip">whoooops.</span>' : i === 6 ? '<span class="sfx sfx-chaos">SPLORP!</span>' : i === 11 ? '<span class="sfx sfx-burst">SURPRISE.</span>' : i === 4 || i === 9 ? '<span class="heart-spark" style="left:17%;top:26%">✧</span><span class="heart-spark" style="left:79%;top:16%;animation-delay:1s">✦</span>' : ""}</div></div>`;
+}
+function pageMarkup(i, side = "left", animate = true) {
+  const s = STORY[i];
+  return `<article class="page ${side} ${animate ? "enter" : ""} ${i === 10 ? "fake-ending" : ""}" aria-label="Page ${i + 1}: ${s.title.replace(/<[^>]*>/g, "")}" data-page="${i}"><div class="page-kicker"><span>${s.kicker}</span><span class="chapter">${String(i + 1).padStart(2, "0")}</span></div>${artMarkup(i)}<h2 class="page-title">${s.title}</h2><p class="narration">${s.narration}</p><div class="dialogue">${s.lines.map(([speaker, line], n) => `<p class="line ${speaker.toLowerCase()}" style="--line:${n}"><span class="speaker">${speaker}</span>${line}</p>`).join("")}</div>${i === 11 ? '<div class="real-end">THE END. FOR REAL. 🍌</div>' : ""}<div class="page-bottom"><span>${i === 11 ? "NO RETURNS. NO REFUNDS." : s.caption}</span><span class="folio">${i + 1}</span></div></article>`;
+}
+function creditsMarkup() {
+  return `<article class="page right credit-page" aria-label="Closing credits"><div class="colophon-flower" aria-hidden="true">❧</div><span class="eyebrow">A BANANA MONKEY PRODUCTION</span><h2>That’s all,<br>sweet reader.</h2><p>One awkward monkey.<br>One very patient monkey.<br>A perfectly sensible ending.</p><div class="credits"><span>STARRING <b>MILO & LUNA</b></span><span>EMOTIONAL SUPPORT <b>BRUNO</b></span><span>CATERING <b>ALSO BRUNO</b></span><span>FILMED ENTIRELY ON <b>THREE TREES</b></span></div><div id="cry-slot">${cryReady ? cryMarkup() : ""}</div><div class="page-bottom"><span>THANK YOU FOR READING</span><span class="flourish">❧</span></div></article>`;
+}
+function cryMarkup() {
+  return '<div class="cry" role="status">WAAAAAAH!</div><p class="cry-caption">…that wasn’t in the credits.</p>';
+}
+function coverMarkup() {
+  return `<section class="cover-wrap" aria-label="Book cover"><div class="cover-type"><span class="cover-eyebrow">A JUNGLE ROMANTIC COMEDY</span><h2 class="cover-title">Banana<br>Monkey<br><em>Love Quest.</em></h2><p class="cover-subtitle">A love story, with issues.</p><div class="cover-rule"></div><p class="cover-description">He wanted a soulmate.<br>He got a story worth telling.<br>And a truly alarming banana bill.</p><span class="cover-imprint">THE ILLUSTRATED EDITION &nbsp; · &nbsp; VOL. 01</span></div><div class="cover-art"><div class="cover-window"><img src="./assets/chapters-01-04.png" alt="Milo nervously offers a banana bouquet to a very amused Luna." draggable="false"></div><div class="cover-seal"><strong>12</strong><span>PAGES OF</span><span>BAD DECISIONS</span></div></div><span class="cover-corner" aria-hidden="true">❧</span></section>`;
+}
+function visiblePages() {
+  if (cursor < 0) return [];
+  if (media.matches) return [cursor];
+  if (cursor === 10 && !revealed) return [10];
+  return [cursor, cursor + 1];
+}
+function isFinal() {
+  return cursor === 11 || (!media.matches && cursor === 10 && revealed);
+}
+function isFakeEnding() {
+  return cursor === 10 && !isFinal();
+}
+function render(animate = true) {
+  clearTimeout(cryTimer);
+  clearTimeout(actionTimer);
+  alignCursor();
+  $("book").classList.toggle("is-open", cursor >= 0);
+  $("book").innerHTML =
+    cursor < 0
+      ? coverMarkup()
+      : `<div class="spread">${media.matches ? pageMarkup(cursor, "left", animate) : pageMarkup(cursor, "left", animate) + (cursor === 10 && !revealed ? creditsMarkup() : pageMarkup(cursor + 1, "right", animate))}</div>`;
+  updateNavigation();
+  const pages = visiblePages();
+  $("announcement").textContent =
+    cursor < 0
+      ? "Book cover. Open the book to begin."
+      : pages
+          .map(
+            (i) => `Page ${i + 1}: ${STORY[i].title.replace(/<[^>]*>/g, "")}`,
+          )
+          .join(". ");
+  if (isFakeEnding()) {
+    if (!cryReady) cryTimer = setTimeout(revealCry, 4200);
+    if (media.matches && cryReady) injectMobileCry();
+  }
+  if (isFinal() && animate) actionTimer = setTimeout(throwBanana, 1700);
+  save();
+}
+function updateNavigation() {
+  $("prev").disabled = cursor < 0;
+  let label =
+    cursor < 0
+      ? "Open the book"
+      : isFinal()
+        ? "Read it again"
+        : isFakeEnding()
+          ? cryReady
+            ? "One more page?"
+            : "The end…?"
+          : "Turn the page";
+  $("next").querySelector(".button-label").textContent = label;
+  $("next").setAttribute("aria-label", label);
+  $("position").textContent =
+    cursor < 0
+      ? "A LOVE STORY, WITH ISSUES"
+      : isFinal()
+        ? "THE END. FOR REAL."
+        : media.matches
+          ? `PAGE ${String(cursor + 1).padStart(2, "0")} OF 12`
+          : cursor === 10
+            ? "THE END. PROBABLY."
+            : `PAGES ${String(cursor + 1).padStart(2, "0")} — ${String(cursor + 2).padStart(2, "0")} OF 12`;
+  $("dots").innerHTML = STORY.map(
+    (_, i) =>
+      `<span class="${visiblePages().includes(i) ? "active" : i < cursor ? "read" : ""}" aria-hidden="true"></span>`,
+  ).join("");
+  $("dots").setAttribute(
+    "aria-label",
+    cursor < 0 ? "Not started" : `Reading page ${cursor + 1} of 12`,
+  );
+  $("hint").innerHTML =
+    cursor < 0
+      ? "12 illustrated pages <span>·</span> About 3 minutes <span>·</span> Best enjoyed with a banana"
+      : isFinal()
+        ? "Thank you for reading. Your last banana is safe with us."
+        : media.matches
+          ? "Swipe to turn <span>·</span> Tap the arrows <span>·</span> Take your sweet time"
+          : "Use ← → to turn the pages <span>·</span> Take your sweet time";
+}
+function injectMobileCry() {
+  const page = $("book").querySelector(".page");
+  if (page && !page.querySelector(".cry")) {
+    const div = document.createElement("div");
+    div.className = "mobile-cry";
+    div.innerHTML = cryMarkup();
+    page.querySelector(".dialogue").replaceChildren(div);
+  }
+}
+function revealCry() {
+  if (!isFakeEnding()) return;
+  cryReady = true;
+  const slot = $("cry-slot");
+  if (slot) slot.innerHTML = cryMarkup();
+  if (media.matches) injectMobileCry();
+  updateNavigation();
+  $("announcement").textContent =
+    "WAAAAAAH! Wait. That wasn’t in the credits. One more page?";
+  playSound("cry");
+}
+function navigate(direction) {
+  if (busy) return;
+  if (direction < 0 && cursor < 0) return;
+  const book = $("book"),
+    old =
+      cursor < 0
+        ? book.querySelector(".cover-wrap")
+        : book.querySelector(
+            direction > 0 && !media.matches ? ".page.right" : ".page.left",
+          );
+  const clone = old?.cloneNode(true);
+  const fromCover = cursor < 0;
+  clearTimeout(cryTimer);
+  clearTimeout(actionTimer);
+  if (direction > 0) {
+    if (cursor < 0) {
+      cursor = 0;
+      revealed = false;
+      cryReady = false;
+    } else if (isFinal()) {
+      cursor = -1;
+      revealed = false;
+      cryReady = false;
+    } else if (!media.matches && cursor === 10 && !revealed) {
+      revealed = true;
+      cryReady = false;
+    } else {
+      cursor += media.matches ? 1 : 2;
+    }
+  } else {
+    if (!media.matches && cursor === 10 && revealed) {
+      revealed = false;
+      cryReady = false;
+    } else {
+      cursor = Math.max(-1, cursor - (media.matches ? 1 : 2));
+      cryReady = false;
+    }
+  }
+  render();
+  playSound("page");
+  if (!motion.matches && clone && !fromCover && cursor >= 0) {
+    busy = true;
+    clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+    clone.classList.remove("enter");
+    const leaf = document.createElement("div");
+    leaf.className = `turn-leaf ${direction > 0 ? "forward-turn" : "backward-turn"}`;
+    leaf.setAttribute("aria-hidden", "true");
+    leaf.append(clone);
+    book.append(leaf);
+    flipTimer = setTimeout(() => {
+      leaf.remove();
+      busy = false;
+    }, 720);
+  } else if (fromCover && !motion.matches) {
+    busy = true;
+    flipTimer = setTimeout(() => {
+      busy = false;
+    }, 650);
+    book.animate(
+      [
+        { transform: "rotateY(-7deg) scale(.98)" },
+        { transform: "rotateY(0) scale(1)" },
+      ],
+      { duration: 650, easing: "ease-out" },
+    );
+  }
+}
+function returnToCover() {
+  clearTimeout(cryTimer);
+  clearTimeout(flipTimer);
+  clearTimeout(actionTimer);
+  busy = false;
+  cursor = -1;
+  revealed = false;
+  cryReady = false;
+  render();
+}
+function throwBanana() {
+  if (!isFinal()) return;
+  playSound("banana");
+  if (motion.matches) return;
+  const banana = document.createElement("img");
+  banana.src = "./assets/flying-banana.svg";
+  banana.alt = "";
+  banana.setAttribute("aria-hidden", "true");
+  banana.className = "banana-projectile";
+  const splat = document.createElement("div");
+  splat.className = "banana-splat";
+  splat.setAttribute("aria-hidden", "true");
+  document.body.append(banana, splat);
+  setTimeout(() => {
+    banana.remove();
+    splat.remove();
+  }, 1600);
+}
+function playSound(kind) {
+  if (!audioOn) return;
+  try {
+    audioContext =
+      audioContext || new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume();
+    const now = audioContext.currentTime;
+    if (kind === "page") {
+      const count = Math.floor(audioContext.sampleRate * 0.18),
+        buffer = audioContext.createBuffer(1, count, audioContext.sampleRate),
+        data = buffer.getChannelData(0);
+      for (let i = 0; i < count; i++)
+        data[i] = (Math.random() * 2 - 1) * (1 - i / count);
+      const source = audioContext.createBufferSource(),
+        filter = audioContext.createBiquadFilter(),
+        gain = audioContext.createGain();
+      source.buffer = buffer;
+      filter.type = "lowpass";
+      filter.frequency.value = 1300;
+      gain.gain.value = 0.13;
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+      source.start();
+    } else {
+      const osc = audioContext.createOscillator(),
+        gain = audioContext.createGain();
+      osc.type = kind === "cry" ? "triangle" : "sine";
+      osc.frequency.setValueAtTime(kind === "cry" ? 620 : 260, now);
+      osc.frequency.exponentialRampToValueAtTime(
+        kind === "cry" ? 430 : 85,
+        now + 0.32,
+      );
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+      osc.start();
+      osc.stop(now + 0.42);
+    }
+  } catch {
+    audioOn = false;
+    updateSoundButton();
+  }
+}
+function updateSoundButton() {
+  const b = $("sound");
+  b.setAttribute("aria-pressed", String(audioOn));
+  b.setAttribute("aria-label", audioOn ? "Turn sound off" : "Turn sound on");
+  b.innerHTML = audioOn
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm5 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6"/></svg>';
+}
+function init() {
+  readSaved();
+  alignCursor();
+  render(false);
+  $("next").addEventListener("click", () => navigate(1));
+  $("prev").addEventListener("click", () => navigate(-1));
+  $("home").addEventListener("click", (e) => {
+    e.preventDefault();
+    returnToCover();
+  });
+  $("restart").addEventListener("click", returnToCover);
+  $("sound").addEventListener("click", () => {
+    audioOn = !audioOn;
+    updateSoundButton();
+    playSound("page");
+  });
+  $("credits-button").addEventListener("click", () => $("about").showModal());
+  $("about")
+    .querySelector(".close-dialog")
+    .addEventListener("click", () => $("about").close());
+  $("about").addEventListener("click", (e) => {
+    if (e.target === $("about")) {
+      const r = $("about").getBoundingClientRect();
+      if (
+        e.clientX < r.left ||
+        e.clientX > r.right ||
+        e.clientY < r.top ||
+        e.clientY > r.bottom
+      )
+        $("about").close();
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (
+      $("about").open ||
+      e.altKey ||
+      e.metaKey ||
+      e.ctrlKey ||
+      ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)
+    )
+      return;
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      navigate(1);
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      navigate(-1);
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      returnToCover();
+    }
+  });
+  $("book").addEventListener("pointerdown", (e) => {
+    if (e.isPrimary === false || e.button !== 0) return;
+    pointerStart = { x: e.clientX, y: e.clientY, id: e.pointerId };
+  });
+  $("book").addEventListener("pointerup", (e) => {
+    if (!pointerStart || pointerStart.id !== e.pointerId) return;
+    const dx = e.clientX - pointerStart.x,
+      dy = e.clientY - pointerStart.y;
+    pointerStart = null;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4)
+      navigate(dx < 0 ? 1 : -1);
+  });
+  $("book").addEventListener("pointercancel", () => (pointerStart = null));
+  media.addEventListener("change", () => {
+    clearTimeout(flipTimer);
+    busy = false;
+    render(false);
+  });
+}
+init();
