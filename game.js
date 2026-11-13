@@ -11,18 +11,13 @@ const STORY = [
     alt: "Milo panics on a phone call with his mother in a cramped treehouse, surrounded by bills, a dying plant, and one lonely banana.",
   },
   {
-    title: "Love at first <em>swipe.</em>",
+    title: "A date with <em>appetite.</em>",
     kicker: "WELCOME TO BANANAR",
     narration:
-      "He joined BANANAR and accidentally matched with a literal banana.",
-    lines: [
-      [
-        "Profile",
-        "“Professional Banana Inspector · Emotionally available · Financially questionable”",
-      ],
-    ],
-    caption: "GREAT PROFILE. ZERO CONVERSATION.",
-    alt: "Milo stares at his phone in disbelief across a candlelit table from a real banana wearing a bow tie.",
+      "His first BANANAR date ordered eighteen banana splits—and asked for the dessert menu.",
+    lines: [["Milo", "“So… are we sharing?”"]],
+    caption: "SHE HAD A TYPE. IT WAS BANANAS.",
+    alt: "Milo sits on a failed app date with a cheerful round monkey in a mustard dress, who eats bananas beside an absurd tower of banana splits and empty peels.",
   },
   {
     title: "An a-peeling <em>match.</em>",
@@ -127,20 +122,21 @@ const STORY = [
     narration: "And they lived happily ever after.",
     lines: [["Narrator", "The end."]],
     caption: "A COMPLETELY NORMAL ENDING.",
-    alt: "Married Milo and Luna sit together on a tree branch beneath a banana-shaped moon, tails curling into a heart against a vast peaceful starry sky.",
+    alt: "Married Milo hugs Luna on a moonlit tree branch; she rests a hand on a subtle baby bump beneath her coral dress, their tails curling into a heart.",
     effect: "ending",
   },
   {
-    title: "A very small <em>plot twist.</em>",
+    title: "Make that <em>two plot twists.</em>",
     kicker: "ONE YEAR LATER…",
-    narration: "Peel Jr.: banana-peel hat, excellent aim, absolutely no income",
+    narration:
+      "Peel Jr. and Pip: twins, banana-peel hats, absolutely no income",
     lines: [
-      ["Bruno", "“WAIT! YOU TWO MADE A MINI MONKEY?!”"],
+      ["Bruno", "“WAIT! YOU MADE TWO MINI MONKEYS?!”"],
       ["Milo", "“I thought marriage was bananas.”"],
-      ["Luna", "“Wait until you see the diaper bill.”"],
+      ["Luna", "“Twice the babies, twice the diaper bill.”"],
     ],
     caption: "THE END. FOR REAL. 🍌",
-    alt: "Luna cradles baby Peel Jr., who wears a banana-peel hat and throws a banana toward the reader; exhausted Milo holds a huge diaper bill while Bruno bursts through the nursery window.",
+    alt: "Luna holds twins Peel Jr. and Pip in banana-peel hats; one baby holds a banana up ready to toss, exhausted Milo holds a huge diaper bill, and Bruno bursts through the window.",
     effect: "baby",
   },
 ];
@@ -182,17 +178,24 @@ function alignCursor() {
   if (!media.matches && cursor >= 0) cursor = Math.floor(cursor / 2) * 2;
 }
 function artMarkup(i) {
+  const revised = [1, 10, 11].includes(i);
   const sheet = Math.floor(i / 4) + 1,
-    x = i % 2,
-    y = Math.floor((i % 4) / 2);
-  return `<div class="illustration" style="--x:${x};--y:${y}"><span class="loading-art" aria-hidden="true">A little jungle magic…</span><img src="./assets/chapters-${sheet === 1 ? "01-04" : sheet === 2 ? "05-08" : "09-12"}.png" alt="${STORY[i].alt}" draggable="false" decoding="async"><div class="ill-overlay" aria-hidden="true">${i === 3 ? '<span class="sfx sfx-slip">whoooops.</span>' : i === 6 ? '<span class="sfx sfx-chaos">SPLORP!</span>' : i === 11 ? '<span class="sfx sfx-burst">SURPRISE.</span>' : i === 4 || i === 9 ? '<span class="heart-spark" style="left:17%;top:26%">✧</span><span class="heart-spark" style="left:79%;top:16%;animation-delay:1s">✦</span>' : ""}</div></div>`;
+    x = revised ? (i === 10 ? 1 : 0) : i % 2,
+    y = revised ? (i === 11 ? 1 : 0) : Math.floor((i % 4) / 2);
+  const asset = revised
+    ? "story-revisions.png"
+    : `chapters-${sheet === 1 ? "01-04" : sheet === 2 ? "05-08" : "09-12"}.png`;
+  return `<div class="illustration" style="--x:${x};--y:${y}"><span class="loading-art" aria-hidden="true">A little jungle magic…</span><img src="./assets/${asset}" alt="${STORY[i].alt}" draggable="false" decoding="async"><div class="ill-overlay" aria-hidden="true">${i === 3 ? '<span class="sfx sfx-slip">whoooops.</span>' : i === 6 ? '<span class="sfx sfx-chaos">SPLORP!</span>' : i === 11 ? '<span class="sfx sfx-burst">SURPRISE.</span>' : i === 4 || i === 9 ? '<span class="heart-spark" style="left:17%;top:26%">✧</span><span class="heart-spark" style="left:79%;top:16%;animation-delay:1s">✦</span>' : ""}</div></div>`;
 }
 function pageMarkup(i, side = "left", animate = true) {
   const s = STORY[i];
-  return `<article class="page ${side} ${animate ? "enter" : ""} ${i === 10 ? "fake-ending" : ""}" aria-label="Page ${i + 1}: ${s.title.replace(/<[^>]*>/g, "")}" data-page="${i}"><div class="page-kicker"><span>${s.kicker}</span><span class="chapter">${String(i + 1).padStart(2, "0")}</span></div>${artMarkup(i)}<h2 class="page-title">${s.title}</h2><p class="narration">${s.narration}</p><div class="dialogue">${s.lines.map(([speaker, line], n) => `<p class="line ${speaker.toLowerCase()}" style="--line:${n}"><span class="speaker">${speaker}</span>${line}</p>`).join("")}</div>${i === 11 ? '<div class="real-end">THE END. FOR REAL. 🍌</div>' : ""}<div class="page-bottom"><span>${i === 11 ? "NO RETURNS. NO REFUNDS." : s.caption}</span><span class="folio">${i + 1}</span></div></article>`;
+  return `<article class="page ${side} ${animate ? "enter" : ""} ${i === 10 ? "fake-ending" : ""}" aria-label="Page ${i + 1}: ${s.title.replace(/<[^>]*>/g, "")}" data-page="${i}"><div class="page-kicker"><span>${s.kicker}</span><span class="chapter">${String(i + 1).padStart(2, "0")}</span></div>${artMarkup(i)}<h2 class="page-title">${s.title}</h2><p class="narration">${s.narration}</p><div class="dialogue">${s.lines.map(([speaker, line], n) => `<p class="line ${speaker.toLowerCase()}" style="--line:${n}"><span class="speaker">${speaker}</span>${line}</p>`).join("")}</div>${i === 10 && !isFinal() && media.matches ? revealPrompt() : ""}${[3, 6, 8, 11].includes(i) ? `<button class="art-secret" data-secret="${i}" aria-label="${i === 3 ? "Catch the flying smoothie" : i === 6 ? "Pop Bruno’s flying shirt button" : i === 8 ? "Tap the tiny proposal banana" : "Let the twins toss their banana"}">${i === 3 ? "🥤" : i === 6 ? "✦" : "🍌"}<span>Tap for a little chaos</span></button>` : ""}${i === 11 ? '<div class="real-end">THE END. FOR REAL. 🍌</div>' : ""}<div class="page-bottom"><span>${i === 11 ? "NO RETURNS. NO REFUNDS." : s.caption}</span><span class="folio">${i + 1}</span></div></article>`;
 }
 function creditsMarkup() {
-  return `<article class="page right credit-page" aria-label="Closing credits"><div class="colophon-flower" aria-hidden="true">❧</div><span class="eyebrow">A BANANA MONKEY PRODUCTION</span><h2>That’s all,<br>sweet reader.</h2><p>One awkward monkey.<br>One very patient monkey.<br>A perfectly sensible ending.</p><div class="credits"><span>STARRING <b>MILO & LUNA</b></span><span>EMOTIONAL SUPPORT <b>BRUNO</b></span><span>CATERING <b>ALSO BRUNO</b></span><span>FILMED ENTIRELY ON <b>THREE TREES</b></span></div><div id="cry-slot">${cryReady ? cryMarkup() : ""}</div><div class="page-bottom"><span>THANK YOU FOR READING</span><span class="flourish">❧</span></div></article>`;
+  return `<article class="page right credit-page" aria-label="Closing credits"><div class="colophon-flower" aria-hidden="true">❧</div><span class="eyebrow">A BANANA MONKEY PRODUCTION</span><h2>That’s all,<br>sweet reader.</h2><p>One awkward monkey.<br>One very patient monkey.<br>A perfectly sensible ending.</p><div class="credits"><span>STARRING <b>MILO & LUNA</b></span><span>EMOTIONAL SUPPORT <b>BRUNO</b></span><span>CATERING <b>ALSO BRUNO</b></span><span>FILMED ENTIRELY ON <b>THREE TREES</b></span></div><div id="cry-slot">${cryReady ? cryMarkup() : ""}</div>${revealPrompt()}<div class="page-bottom"><span>THANK YOU FOR READING</span><span class="flourish">❧</span></div></article>`;
+}
+function revealPrompt() {
+  return '<button class="reveal-prompt" data-reveal="true"><strong>There’s one last secret…</strong><span>Turn the page to reveal the surprise →</span></button>';
 }
 function cryMarkup() {
   return '<div class="cry" role="status">WAAAAAAH!</div><p class="cry-caption">…that wasn’t in the credits.</p>';
@@ -247,8 +250,8 @@ function updateNavigation() {
         ? "Read it again"
         : isFakeEnding()
           ? cryReady
-            ? "One more page?"
-            : "The end…?"
+            ? "Reveal the surprise"
+            : "Turn for the surprise"
           : "Turn the page";
   $("next").querySelector(".button-label").textContent = label;
   $("next").setAttribute("aria-label", label);
@@ -296,7 +299,7 @@ function revealCry() {
   if (media.matches) injectMobileCry();
   updateNavigation();
   $("announcement").textContent =
-    "WAAAAAAH! Wait. That wasn’t in the credits. One more page?";
+    "WAAAAAAH! Wait. That wasn’t in the credits. Turn the page to reveal the surprise.";
   playSound("cry");
 }
 function navigate(direction) {
@@ -376,23 +379,34 @@ function returnToCover() {
   cryReady = false;
   render();
 }
-function throwBanana() {
-  if (!isFinal()) return;
-  playSound("banana");
+function flyFromPage(kind = "banana", page = 11) {
   if (motion.matches) return;
-  const banana = document.createElement("img");
-  banana.src = "./assets/flying-banana.svg";
-  banana.alt = "";
-  banana.setAttribute("aria-hidden", "true");
-  banana.className = "banana-projectile";
-  const splat = document.createElement("div");
-  splat.className = "banana-splat";
-  splat.setAttribute("aria-hidden", "true");
-  document.body.append(banana, splat);
-  setTimeout(() => {
-    banana.remove();
-    splat.remove();
-  }, 1600);
+  const art = $("book").querySelector(
+    `.spread > [data-page="${page}"] .illustration`,
+  );
+  if (!art) return;
+  const r = art.getBoundingClientRect(),
+    b = $("book").getBoundingClientRect();
+  const x = r.left + r.width * 0.65,
+    y = r.top + r.height * 0.4;
+  const projectile = document.createElement(kind === "banana" ? "img" : "span");
+  if (kind === "banana") projectile.src = "./assets/flying-banana.svg";
+  else projectile.textContent = kind === "smoothie" ? "🥤" : "✦";
+  projectile.setAttribute("aria-hidden", "true");
+  projectile.className = "banana-projectile";
+  projectile.style.left = x + "px";
+  projectile.style.top = y + "px";
+  projectile.style.setProperty("--flight-x", b.left + b.width * 0.5 - x + "px");
+  projectile.style.setProperty(
+    "--flight-y",
+    Math.max(25, b.top - 65) - y + "px",
+  );
+  document.body.append(projectile);
+  playSound("banana");
+  setTimeout(() => projectile.remove(), 2000);
+}
+function throwBanana() {
+  if (isFinal()) flyFromPage("banana", 11);
 }
 function playSound(kind) {
   if (!audioOn) return;
@@ -448,6 +462,14 @@ function updateSoundButton() {
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6"/></svg>';
 }
 function init() {
+  $("book").addEventListener("click", (event) => {
+    if (event.target.closest("[data-reveal]")) navigate(1);
+    const secret = event.target.closest("[data-secret]");
+    if (secret && !busy) {
+      const i = Number(secret.dataset.secret);
+      flyFromPage(i === 3 ? "smoothie" : i === 6 ? "button" : "banana", i);
+    }
+  });
   readSaved();
   alignCursor();
   render(false);

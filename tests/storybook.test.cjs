@@ -136,7 +136,7 @@ test("desktop: cover, every spread, twelve unique illustrated actions, fake endi
   assert(!r.$("book").querySelector('[data-page="11"]'));
   r.tick(4200);
   assert(r.$("book").textContent.includes("WAAAAAAH!"));
-  assert(r.$("next").textContent.includes("One more page"));
+  assert(r.$("next").textContent.includes("Reveal the surprise"));
   r.next();
   assert.deepEqual(r.pages(), [10, 11]);
   assert(r.$("book").textContent.includes("diaper bill"));
@@ -282,6 +282,7 @@ test("all assets exist, paths work under a GitHub Pages subdirectory, and illust
     "chapters-01-04.png",
     "chapters-05-08.png",
     "chapters-09-12.png",
+    "story-revisions.png",
   ]) {
     const b = fs.readFileSync(path.join(root, "assets", file));
     assert.equal(b.toString("ascii", 1, 4), "PNG");
@@ -300,5 +301,38 @@ test("resizing the baby reveal keeps the reveal visible on desktop", () => {
   r.resize(false);
   assert.deepEqual(r.pages(), [10, 11]);
   assert(r.$("book").textContent.includes("Peel Jr."));
+  r.close();
+});
+
+test("inside-book reveal prompt gets desktop and mobile readers to the twins", () => {
+  for (const mobile of [false, true]) {
+    const r = reader({
+      mobile,
+      saved: JSON.stringify({ cursor: 10, revealed: false }),
+    });
+    const prompt = r.$("book").querySelector("[data-reveal]");
+    assert(prompt.textContent.includes("Turn the page"));
+    assert(!r.$("book").textContent.includes("Peel Jr."));
+    prompt.click();
+    r.tick();
+    assert(r.$("book").textContent.includes("Peel Jr. and Pip"));
+    assert(r.$("book").textContent.includes("TWO MINI MONKEYS"));
+    assert(r.$("book").textContent.includes("diaper bill"));
+    r.close();
+  }
+});
+test("secret art gags are optional, work on all four action pages, and never block the ending", () => {
+  const r = reader({ mobile: true });
+  for (let i = 0; i < 12; i++) {
+    r.next();
+    if ([3, 6, 8, 11].includes(i)) {
+      const trigger = r.$("book").querySelector("[data-secret]");
+      assert(trigger);
+      trigger.click();
+      assert(r.w.document.querySelector(".banana-projectile"));
+      r.tick(2100);
+    }
+  }
+  assert(r.$("book").textContent.includes("THE END. FOR REAL."));
   r.close();
 });

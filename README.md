@@ -1,6 +1,6 @@
 # Banana Monkey Love Quest
 
-A twelve-page illustrated romantic comedy about Milo, Luna, an extremely confident gorilla, and one unexpected small monkey.
+A twelve-page illustrated romantic comedy about Milo, Luna, an extremely confident gorilla, and two unexpected small monkeys.
 
 ## The book
 
@@ -8,9 +8,10 @@ A twelve-page illustrated romantic comedy about Milo, Luna, an extremely confide
 - Twelve distinct gouache-style scenes, with consistent characters and specific physical comedy.
 - Two facing pages on desktop; one page at a time on phones (700px breakpoint).
 - Animated page turns, horizontal swipe gestures, keyboard arrows, and a cover/restart control.
+- Optional hidden flying smoothie, shirt-button, and banana gags; none block progress.
 - Short narration and sarcastic dialogue; no mini-games or choices interrupting the story.
-- A fake ending with credits and a delayed cry. Page twelve stays concealed until the reader turns again, even on desktop.
-- A baby reveal and a banana thrown toward the reader.
+- A fake ending with credits and a delayed cry. An explicit inside-book page-turn button leads to the concealed final reveal, even when the navigation is below the screen.
+- A twins reveal and a banana that arcs from the baby’s hand up over the book.
 - Optional generated page-turn and comic sound effects. Sound starts off.
 - Device-local reading progress, resilient to blocked storage; reduced-motion support and accessible illustration descriptions.
 
@@ -42,7 +43,7 @@ These tests do not verify browser rendering, physical-device gestures, or percei
 - `index.html` — book shell, navigation, and about dialog
 - `style.css` — hardcover, spread layouts, typography, and animations
 - `game.js` — twelve-page story, page turns, timing, sound, and progress
-- `assets/chapters-*.png` — three illustrated sheets, each containing four unique scenes; CSS displays one quadrant per page
+- `assets/chapters-*.png` — original illustrated sheets plus a revision sheet for the failed date, pregnancy hint, and twins; CSS displays one quadrant per page
 - `assets/banana.svg` and `assets/flying-banana.svg` — favicon and final banana animation
 - `tests/storybook.test.cjs` — automated interaction checks
 
