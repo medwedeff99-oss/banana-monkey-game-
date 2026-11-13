@@ -146,10 +146,9 @@ let cursor = -1,
   revealed = false,
   cryReady = false,
   busy = false,
-  audioOn = false,
+  audioOn = true,
   audioContext,
-  narratorOn = false,
-  audioGeneration = 0,
+  audioUnlocked = false,
   sceneTimers = [],
   cryTimer,
   flipTimer,
@@ -346,7 +345,6 @@ function navigate(direction) {
     }
   }
   render();
-  playSound("page");
   if (!motion.matches && clone && !fromCover && cursor >= 0) {
     busy = true;
     clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
@@ -430,39 +428,20 @@ function playSound(kind) {
       audioContext || new (window.AudioContext || window.webkitAudioContext)();
     audioContext.resume();
     const now = audioContext.currentTime;
-    if (kind === "page") {
-      const count = Math.floor(audioContext.sampleRate * 0.18),
-        buffer = audioContext.createBuffer(1, count, audioContext.sampleRate),
-        data = buffer.getChannelData(0);
-      for (let i = 0; i < count; i++)
-        data[i] = (Math.random() * 2 - 1) * (1 - i / count);
-      const source = audioContext.createBufferSource(),
-        filter = audioContext.createBiquadFilter(),
-        gain = audioContext.createGain();
-      source.buffer = buffer;
-      filter.type = "lowpass";
-      filter.frequency.value = 1300;
-      gain.gain.value = 0.13;
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioContext.destination);
-      source.start();
-    } else {
-      const osc = audioContext.createOscillator(),
-        gain = audioContext.createGain();
-      osc.type = kind === "cry" ? "triangle" : "sine";
-      osc.frequency.setValueAtTime(kind === "cry" ? 620 : 260, now);
-      osc.frequency.exponentialRampToValueAtTime(
-        kind === "cry" ? 430 : 85,
-        now + 0.32,
-      );
-      gain.gain.setValueAtTime(0.04, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-      osc.start();
-      osc.stop(now + 0.42);
-    }
+    const osc = audioContext.createOscillator(),
+      gain = audioContext.createGain();
+    osc.type = kind === "cry" ? "triangle" : "sine";
+    osc.frequency.setValueAtTime(kind === "cry" ? 620 : 260, now);
+    osc.frequency.exponentialRampToValueAtTime(
+      kind === "cry" ? 430 : 85,
+      now + 0.32,
+    );
+    gain.gain.setValueAtTime(0.04, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start();
+    osc.stop(now + 0.42);
   } catch {
     audioOn = false;
     updateSoundButton();
@@ -495,79 +474,28 @@ const SCENE_AUDIO = [
   { kind: "monkey", label: "audience: DOUBLE GASP!" },
 ];
 function stopStoryAudio() {
-  audioGeneration++;
   sceneTimers.forEach(clearTimeout);
   sceneTimers = [];
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-  document
-    .querySelectorAll(".is-speaking")
-    .forEach((p) => p.classList.remove("is-speaking"));
 }
 function queueStoryAudio() {
-  sceneTimers.forEach(clearTimeout);
-  sceneTimers = [];
-  if (narratorOn) {
-    sceneTimers.push(setTimeout(narrateVisiblePages, 750));
-    return;
-  }
+  stopStoryAudio();
   if (audioOn)
     visiblePages().forEach((page, i) =>
       sceneTimers.push(setTimeout(() => playSceneAudio(page), 800 + i * 2100)),
     );
 }
-function narrateVisiblePages() {
-  if (!narratorOn || !window.speechSynthesis) return;
-  const generation = audioGeneration;
-  const pages = visiblePages();
-  const narrate = (n) => {
-    if (!narratorOn || generation !== audioGeneration) return;
-    if (n >= pages.length) return;
-    const i = pages[n],
-      s = STORY[i];
-    const text =
-      s.title.replace(/<[^>]*>/g, "") +
-      ". " +
-      s.narration +
-      " " +
-      s.lines
-        .map(
-          ([speaker, line]) =>
-            (speaker === "Narrator" ? "" : speaker + " says: ") + line,
-        )
-        .join(" ");
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
-    const voices = window.speechSynthesis.getVoices();
-    const voice =
-      voices.find(
-        (v) =>
-          v.lang.startsWith("en") &&
-          /natural|premium|samantha|daniel/i.test(v.name),
-      ) || voices.find((v) => v.lang.startsWith("en"));
-    if (voice) utterance.voice = voice;
-    const page = $("book").querySelector(`.spread > [data-page="${i}"]`);
-    if (page) page.classList.add("is-speaking");
-    utterance.onend = () => {
-      if (generation !== audioGeneration) return;
-      if (page) page.classList.remove("is-speaking");
-      playSceneAudio(i);
-      sceneTimers.push(setTimeout(() => narrate(n + 1), 900));
-    };
-    utterance.onerror = () => {
-      if (generation === audioGeneration && page)
-        page.classList.remove("is-speaking");
-    };
-    window.speechSynthesis.speak(utterance);
-  };
-  if (!pages.length) {
-    const intro = new SpeechSynthesisUtterance(
-      "Banana Monkey Love Quest. A love story, with issues. Open the book to begin.",
-    );
-    intro.rate = 0.95;
-    window.speechSynthesis.speak(intro);
-  } else narrate(0);
+function unlockAudio() {
+  if (!audioOn || audioUnlocked) return;
+  try {
+    audioContext =
+      audioContext || new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume();
+    audioUnlocked = true;
+    queueStoryAudio();
+  } catch {
+    audioOn = false;
+    updateSoundButton();
+  }
 }
 function playSceneAudio(page) {
   if (!audioOn) return;
@@ -676,20 +604,12 @@ function init() {
       flyFromPage(i === 3 ? "smoothie" : i === 6 ? "leaf" : "banana", i);
     }
   });
-  const supportsSpeech =
-    "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
-  $("narrator").disabled = !supportsSpeech;
-  if (!supportsSpeech)
-    $("narrator").title =
-      "Read aloud is unavailable in this browser; scene sounds are still available.";
-  $("narrator").addEventListener("click", () => {
-    narratorOn = !narratorOn;
-    $("narrator").setAttribute("aria-pressed", String(narratorOn));
-    $("narrator").textContent = narratorOn ? "Stop reading" : "Read aloud";
-    stopStoryAudio();
-    if (narratorOn) narrateVisiblePages();
-    else queueStoryAudio();
-  });
+  document.addEventListener("pointerdown", unlockAudio, { capture: true });
+  document.addEventListener("keydown", unlockAudio, { capture: true });
+  try {
+    audioOn = localStorage.getItem("banana-monkey-sound") !== "off";
+  } catch {}
+  updateSoundButton();
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) stopStoryAudio();
   });
@@ -706,14 +626,14 @@ function init() {
   $("sound").addEventListener("click", () => {
     audioOn = !audioOn;
     updateSoundButton();
+    try {
+      localStorage.setItem("banana-monkey-sound", audioOn ? "on" : "off");
+    } catch {}
     if (audioOn) {
-      playSound("page");
-      if (!narratorOn) queueStoryAudio();
+      audioUnlocked = false;
+      unlockAudio();
     } else {
-      if (!narratorOn) {
-        sceneTimers.forEach(clearTimeout);
-        sceneTimers = [];
-      }
+      stopStoryAudio();
       if (audioContext) audioContext.suspend();
     }
   });

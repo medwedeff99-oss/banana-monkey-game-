@@ -12,7 +12,7 @@
       content="A twelve-page illustrated jungle rom-com. One awkward monkey, one terrible pickup line, and a very unexpected happily ever after."
     />
     <title>Banana Monkey Love Quest — A Love Story, With Issues</title>
-    <link rel="stylesheet" href="./style.css?v=audio-story" />
+    <link rel="stylesheet" href="./style.css?v=funny-mobile" />
     <link rel="icon" href="./assets/banana.svg" type="image/svg+xml" />
   </head>
   <body>
@@ -39,25 +39,21 @@
         ></a
       >
       <div class="top-actions">
-        <span class="edition">THE PICTURE BOOK EDITION</span
-        ><button
-          id="narrator"
-          class="narrator-toggle"
-          aria-pressed="false"
-          title="Read the visible pages aloud"
-        >
-          Read aloud</button
-        ><button
+        <span class="edition">THE PICTURE BOOK EDITION</span>
+        <button
           id="sound"
           class="icon-btn"
-          aria-label="Turn sound effects on"
-          title="Scene sound effects"
-          aria-pressed="false"
+          aria-label="Turn sound effects off"
+          title="Funny sounds on — click to mute"
+          aria-pressed="true"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6" />
-          </svg></button
-        ><button
+            <path
+              d="M11 5 6 9H3v6h3l5 4V5Zm5 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"
+            />
+          </svg>
+        </button>
+        <button
           id="restart"
           class="icon-btn"
           aria-label="Return to book cover"
@@ -129,6 +125,6 @@
         CSS, and JavaScript.</small
       >
     </dialog>
-    <script src="./game.js?v=audio-story" defer></script>
+    <script src="./game.js?v=funny-mobile" defer></script>
   </body>
 </html>
