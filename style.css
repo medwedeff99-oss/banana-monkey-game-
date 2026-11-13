@@ -1444,7 +1444,7 @@ img {
   opacity: 1;
 }
 .banana-projectile {
-  animation: banana-arc 1.8s ease-in-out both;
+  animation: banana-arc 2.4s ease-in-out both;
   display: grid;
   place-items: center;
   font-size: 70px;
@@ -1469,18 +1469,18 @@ img {
   80% {
     opacity: 1;
     transform: translate(
-        calc(-50% + var(--flight-x) + 140px),
-        calc(-50% + var(--flight-y) - 30px)
+        calc(-50% + var(--flight-x)),
+        calc(-50% + var(--landing-y))
       )
-      scale(2.5) rotate(240deg);
+      scale(var(--big-scale)) rotate(240deg);
   }
   100% {
     opacity: 0;
     transform: translate(
-        calc(-50% + var(--flight-x) + 260px),
-        calc(-50% + var(--flight-y) + 70px)
+        calc(-50% + var(--flight-x)),
+        calc(-50% + var(--landing-y))
       )
-      scale(3.5) rotate(320deg);
+      scale(var(--end-scale)) rotate(320deg);
   }
 }
 @media (max-width: 700px) {

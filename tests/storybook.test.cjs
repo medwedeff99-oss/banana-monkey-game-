@@ -150,7 +150,7 @@ test("desktop: cover, every spread, twelve unique illustrated actions, fake endi
   assert.equal(arts.size, 12);
   r.tick(1000);
   assert(r.w.document.querySelector(".banana-projectile"));
-  r.tick(2000);
+  r.tick(3200);
   assert(!r.w.document.querySelector(".banana-projectile"));
   r.next();
   assert(r.$("book").querySelector(".cover-wrap"));
@@ -283,6 +283,7 @@ test("all assets exist, paths work under a GitHub Pages subdirectory, and illust
     "chapters-05-08.png",
     "chapters-09-12.png",
     "story-revisions.png",
+    "kindness-spread.png",
   ]) {
     const b = fs.readFileSync(path.join(root, "assets", file));
     assert.equal(b.toString("ascii", 1, 4), "PNG");
@@ -334,5 +335,40 @@ test("secret art gags are optional, work on all four action pages, and never blo
     }
   }
   assert(r.$("book").textContent.includes("THE END. FOR REAL."));
+  r.close();
+});
+
+test("Milo wins through brave kindness and befriends Bruno before the wedding", () => {
+  const r = reader({ saved: JSON.stringify({ cursor: 6, revealed: false }) });
+  const spread = r.$("book").textContent;
+  assert(spread.includes("shelter Luna"));
+  assert(spread.includes("made room under the leaf for Bruno"));
+  assert(spread.includes("can I still come to the wedding"));
+  assert(!spread.includes("backflipped"));
+  assert(!spread.includes("ONE brain cell"));
+  assert.equal(
+    r.$("book").querySelector('[data-secret="6"]').getAttribute("aria-label"),
+    "Send Milo’s brave leaf flying",
+  );
+  r.next();
+  assert(r.$("book").textContent.includes("Bruno officiating"));
+  r.close();
+});
+
+test("final banana grows to fill most of the viewport", () => {
+  const r = reader({
+    mobile: true,
+    saved: JSON.stringify({ cursor: 11, revealed: true }),
+  });
+  r.$("book").querySelector('[data-secret="11"]').click();
+  const banana = r.w.document.querySelector(".banana-projectile");
+  assert(
+    Number(banana.style.getPropertyValue("--big-scale")) * 90 >=
+      r.w.innerWidth * 0.8,
+  );
+  assert(
+    Number(banana.style.getPropertyValue("--end-scale")) >
+      Number(banana.style.getPropertyValue("--big-scale")),
+  );
   r.close();
 });

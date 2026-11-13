@@ -8,7 +8,7 @@ A twelve-page illustrated romantic comedy about Milo, Luna, an extremely confide
 - Twelve distinct gouache-style scenes, with consistent characters and specific physical comedy.
 - Two facing pages on desktop; one page at a time on phones (700px breakpoint).
 - Animated page turns, horizontal swipe gestures, keyboard arrows, and a cover/restart control.
-- Optional hidden flying smoothie, shirt-button, and banana gags; none block progress.
+- Optional hidden flying smoothie, brave-leaf, and banana gags; none block progress.
 - Short narration and sarcastic dialogue; no mini-games or choices interrupting the story.
 - A fake ending with credits and a delayed cry. An explicit inside-book page-turn button leads to the concealed final reveal, even when the navigation is below the screen.
 - A twins reveal and a banana that arcs from the baby’s hand up over the book.

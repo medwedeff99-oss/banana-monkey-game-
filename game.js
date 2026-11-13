@@ -69,30 +69,28 @@ const STORY = [
     alt: "Huge purple-shirted gorilla Bruno makes a heroic entrance carrying a mountain of bananas; tiny Milo holds a pathetic dying houseplant and Luna looks unimpressed.",
   },
   {
-    title: "A very smooth <em>move.</em>",
-    kicker: "TWO MEN. ONE SHARED BRAIN CELL.",
-    narration: "Bruno flirted; Milo challenged him.",
+    title: "A little <em>bravery.</em>",
+    kicker: "BIG HEART. TERRIBLE WEATHER.",
+    narration:
+      "When the café awning collapsed, Milo leapt through the rain to shelter Luna with a giant leaf.",
     lines: [
-      [
-        "Narrator",
-        "Bruno flexed out of his shirt; Milo backflipped directly into a banana smoothie.",
-      ],
+      ["Luna", "“You’re getting soaked!”"],
+      ["Milo", "“You’re worth a little weather.”"],
     ],
-    caption: "NEITHER HAD A BACKUP PLAN.",
-    alt: "Bruno flexes so hard his purple sleeves rip while upside-down Milo lands headfirst in a giant pink smoothie; Luna facepalms in the background.",
-    effect: "chaos",
+    caption: "KINDNESS: 1. BICEPS: 0.",
+    alt: "Soaked Milo bravely leaps through a puddle to shelter Luna and a rescued bird under a giant banana leaf while Bruno struggles to protect his bananas with a tiny pink umbrella.",
+    effect: "bravery",
   },
   {
-    title: "Three trees. <em>One idiot.</em>",
-    kicker: "A SMALL MISUNDERSTANDING",
-    narration: "A misunderstanding, a kiss, and absolutely no competition",
+    title: "One heart. <em>One new friend.</em>",
+    kicker: "HE WON MORE THAN HER HEART",
+    narration: "Milo made room under the leaf for Bruno, too.",
     lines: [
-      ["Luna", "“Milo! I don’t want a gorilla!”"],
-      ["Milo", "“But he has THREE TREES!”"],
-      ["Luna", "“And apparently ONE brain cell!”"],
+      ["Bruno", "“Okay, you win—can I still come to the wedding?”"],
+      ["Luna", "“Only if you bring all three trees.”"],
     ],
-    caption: "COMMUNICATION. AN UNEXPECTED CONCEPT.",
-    alt: "Luna holds Milo’s face and kisses his cheek on a moonlit footbridge; both laugh, with pink smoothie still in his hair and Bruno fussing over trees far behind.",
+    caption: "RIVALRY CANCELLED. FRIENDSHIP BOOKED.",
+    alt: "Luna kisses brave rain-soaked Milo on a lantern-lit bridge; their new friend Bruno sheepishly offers a banana bouquet and carries his tiny broken umbrella in the background.",
   },
   {
     title: "The wrong <em>pocket.</em>",
@@ -182,14 +180,16 @@ function artMarkup(i) {
   const sheet = Math.floor(i / 4) + 1,
     x = revised ? (i === 10 ? 1 : 0) : i % 2,
     y = revised ? (i === 11 ? 1 : 0) : Math.floor((i % 4) / 2);
-  const asset = revised
-    ? "story-revisions.png"
-    : `chapters-${sheet === 1 ? "01-04" : sheet === 2 ? "05-08" : "09-12"}.png`;
-  return `<div class="illustration" style="--x:${x};--y:${y}"><span class="loading-art" aria-hidden="true">A little jungle magic…</span><img src="./assets/${asset}" alt="${STORY[i].alt}" draggable="false" decoding="async"><div class="ill-overlay" aria-hidden="true">${i === 3 ? '<span class="sfx sfx-slip">whoooops.</span>' : i === 6 ? '<span class="sfx sfx-chaos">SPLORP!</span>' : i === 11 ? '<span class="sfx sfx-burst">SURPRISE.</span>' : i === 4 || i === 9 ? '<span class="heart-spark" style="left:17%;top:26%">✧</span><span class="heart-spark" style="left:79%;top:16%;animation-delay:1s">✦</span>' : ""}</div></div>`;
+  const asset = [6, 7].includes(i)
+    ? "kindness-spread.png"
+    : revised
+      ? "story-revisions.png"
+      : `chapters-${sheet === 1 ? "01-04" : sheet === 2 ? "05-08" : "09-12"}.png`;
+  return `<div class="illustration" style="--x:${x};--y:${y}"><span class="loading-art" aria-hidden="true">A little jungle magic…</span><img src="./assets/${asset}" alt="${STORY[i].alt}" draggable="false" decoding="async"><div class="ill-overlay" aria-hidden="true">${i === 3 ? '<span class="sfx sfx-slip">whoooops.</span>' : i === 6 ? '<span class="sfx sfx-chaos">WHOOSH!</span>' : i === 11 ? '<span class="sfx sfx-burst">SURPRISE.</span>' : i === 4 || i === 9 ? '<span class="heart-spark" style="left:17%;top:26%">✧</span><span class="heart-spark" style="left:79%;top:16%;animation-delay:1s">✦</span>' : ""}</div></div>`;
 }
 function pageMarkup(i, side = "left", animate = true) {
   const s = STORY[i];
-  return `<article class="page ${side} ${animate ? "enter" : ""} ${i === 10 ? "fake-ending" : ""}" aria-label="Page ${i + 1}: ${s.title.replace(/<[^>]*>/g, "")}" data-page="${i}"><div class="page-kicker"><span>${s.kicker}</span><span class="chapter">${String(i + 1).padStart(2, "0")}</span></div>${artMarkup(i)}<h2 class="page-title">${s.title}</h2><p class="narration">${s.narration}</p><div class="dialogue">${s.lines.map(([speaker, line], n) => `<p class="line ${speaker.toLowerCase()}" style="--line:${n}"><span class="speaker">${speaker}</span>${line}</p>`).join("")}</div>${i === 10 && !isFinal() && media.matches ? revealPrompt() : ""}${[3, 6, 8, 11].includes(i) ? `<button class="art-secret" data-secret="${i}" aria-label="${i === 3 ? "Catch the flying smoothie" : i === 6 ? "Pop Bruno’s flying shirt button" : i === 8 ? "Tap the tiny proposal banana" : "Let the twins toss their banana"}">${i === 3 ? "🥤" : i === 6 ? "✦" : "🍌"}<span>Tap for a little chaos</span></button>` : ""}${i === 11 ? '<div class="real-end">THE END. FOR REAL. 🍌</div>' : ""}<div class="page-bottom"><span>${i === 11 ? "NO RETURNS. NO REFUNDS." : s.caption}</span><span class="folio">${i + 1}</span></div></article>`;
+  return `<article class="page ${side} ${animate ? "enter" : ""} ${i === 10 ? "fake-ending" : ""}" aria-label="Page ${i + 1}: ${s.title.replace(/<[^>]*>/g, "")}" data-page="${i}"><div class="page-kicker"><span>${s.kicker}</span><span class="chapter">${String(i + 1).padStart(2, "0")}</span></div>${artMarkup(i)}<h2 class="page-title">${s.title}</h2><p class="narration">${s.narration}</p><div class="dialogue">${s.lines.map(([speaker, line], n) => `<p class="line ${speaker.toLowerCase()}" style="--line:${n}"><span class="speaker">${speaker}</span>${line}</p>`).join("")}</div>${i === 10 && !isFinal() && media.matches ? revealPrompt() : ""}${[3, 6, 8, 11].includes(i) ? `<button class="art-secret" data-secret="${i}" aria-label="${i === 3 ? "Catch the flying smoothie" : i === 6 ? "Send Milo’s brave leaf flying" : i === 8 ? "Tap the tiny proposal banana" : "Let the twins toss their banana"}">${i === 3 ? "🥤" : i === 6 ? "🍃" : "🍌"}<span>Tap for a little chaos</span></button>` : ""}${i === 11 ? '<div class="real-end">THE END. FOR REAL. 🍌</div>' : ""}<div class="page-bottom"><span>${i === 11 ? "NO RETURNS. NO REFUNDS." : s.caption}</span><span class="folio">${i + 1}</span></div></article>`;
 }
 function creditsMarkup() {
   return `<article class="page right credit-page" aria-label="Closing credits"><div class="colophon-flower" aria-hidden="true">❧</div><span class="eyebrow">A BANANA MONKEY PRODUCTION</span><h2>That’s all,<br>sweet reader.</h2><p>One awkward monkey.<br>One very patient monkey.<br>A perfectly sensible ending.</p><div class="credits"><span>STARRING <b>MILO & LUNA</b></span><span>EMOTIONAL SUPPORT <b>BRUNO</b></span><span>CATERING <b>ALSO BRUNO</b></span><span>FILMED ENTIRELY ON <b>THREE TREES</b></span></div><div id="cry-slot">${cryReady ? cryMarkup() : ""}</div>${revealPrompt()}<div class="page-bottom"><span>THANK YOU FOR READING</span><span class="flourish">❧</span></div></article>`;
@@ -391,19 +391,29 @@ function flyFromPage(kind = "banana", page = 11) {
     y = r.top + r.height * 0.4;
   const projectile = document.createElement(kind === "banana" ? "img" : "span");
   if (kind === "banana") projectile.src = "./assets/flying-banana.svg";
-  else projectile.textContent = kind === "smoothie" ? "🥤" : "✦";
+  else projectile.textContent = kind === "smoothie" ? "🥤" : "🍃";
   projectile.setAttribute("aria-hidden", "true");
   projectile.className = "banana-projectile";
   projectile.style.left = x + "px";
   projectile.style.top = y + "px";
-  projectile.style.setProperty("--flight-x", b.left + b.width * 0.5 - x + "px");
+  projectile.style.setProperty(
+    "--flight-x",
+    window.innerWidth * 0.5 - x + "px",
+  );
   projectile.style.setProperty(
     "--flight-y",
     Math.max(25, b.top - 65) - y + "px",
   );
+  projectile.style.setProperty(
+    "--landing-y",
+    window.innerHeight * 0.42 - y + "px",
+  );
+  const bigScale = Math.min(1100, window.innerWidth * 0.85) / 90;
+  projectile.style.setProperty("--big-scale", String(bigScale));
+  projectile.style.setProperty("--end-scale", String(bigScale * 1.45));
   document.body.append(projectile);
   playSound("banana");
-  setTimeout(() => projectile.remove(), 2000);
+  setTimeout(() => projectile.remove(), 2700);
 }
 function throwBanana() {
   if (isFinal()) flyFromPage("banana", 11);
@@ -467,7 +477,7 @@ function init() {
     const secret = event.target.closest("[data-secret]");
     if (secret && !busy) {
       const i = Number(secret.dataset.secret);
-      flyFromPage(i === 3 ? "smoothie" : i === 6 ? "button" : "banana", i);
+      flyFromPage(i === 3 ? "smoothie" : i === 6 ? "leaf" : "banana", i);
     }
   });
   readSaved();
